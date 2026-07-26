@@ -3,3 +3,10 @@ __pycache__/
 .DS_Store
 archive/
 *.session
+# 生成产物与缓存（由 CI 重新生成）
+dashboard.html
+aipm_cache.json
+# 调试/探针脚本（非源码，勿入库）
+dbg_fin*.py
+probe2.py
+recon*.py
