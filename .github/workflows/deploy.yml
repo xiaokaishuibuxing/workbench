@@ -1,0 +1,40 @@
+name: 每日生成工作台
+
+on:
+  schedule:
+    - cron: '0 0 * * *'        # 每天 UTC 00:00 = 北京 08:00
+  workflow_dispatch:           # 支持在 Actions 页面手动触发
+
+permissions:
+  contents: write              # 允许推送到 gh-pages 分支
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 配置 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 安装依赖
+        run: pip install -r requirements.txt
+
+      - name: 生成每日工作台 HTML
+        env:
+          DISABLE_ICLOUD: '1'
+        run: python workbench.py --no-icloud
+
+      - name: 准备 Pages 产物
+        run: mkdir -p public && cp dashboard.html public/index.html
+
+      - name: 部署到 GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
+          publish_branch: gh-pages
+          commit_message: "chore: 自动更新工作台 ${{ github.run_id }}"
