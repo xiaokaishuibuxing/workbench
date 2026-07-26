@@ -1,6 +1,8 @@
 name: 每日生成工作台
 
 on:
+  push:
+    branches: [main]            # 推送 main 即自动部署
   schedule:
     - cron: '0 0 * * *'        # 每天 UTC 00:00 = 北京 08:00
   workflow_dispatch:           # 支持在 Actions 页面手动触发
