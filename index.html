@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>每日工作台 · 2026-07-26</title>
+<style>
+:root{--bg:#f5f6f8;--card:#ffffff;--ink:#1f2430;--sub:#6b7280;--line:#e6e8ec;
+--accent:#3b6ef5;--green:#1f9d55;--red:#d8442f;--chip:#eef2ff;--shadow:0 1px 3px rgba(0,0,0,.06);
+--sidebar-active:#6b8c42;--sidebar-active-text:#ffffff;--sidebar-hover:#f3f5ef}
+[data-theme=dark]{--bg:#16181d;--card:#1f232b;--ink:#e6e8ec;--sub:#9aa3b2;--line:#2c313a;
+--accent:#5b8bff;--green:#34d27b;--red:#ff6b54;--chip:#232a36;--shadow:0 1px 3px rgba(0,0,0,.4);
+--sidebar-active:#8cae62;--sidebar-active-text:#11151a;--sidebar-hover:#252b33}
+*{box-sizing:border-box}html,body{margin:0;height:100%;overflow:hidden;background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;
+font-size:15px;line-height:1.55}
+.app{display:flex;height:100vh;width:100vw}
+/* sidebar */
+.sidebar{width:260px;flex-shrink:0;background:var(--card);border-right:1px solid var(--line);
+display:flex;flex-direction:column;padding:22px 12px 16px;transition:transform .25s ease}
+.brand{display:flex;align-items:center;gap:12px;padding:0 8px 18px;border-bottom:1px solid var(--line);margin-bottom:12px}
+.avatar{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#6b8c42,#9db36b);
+display:flex;align-items:center;justify-content:center;font-size:22px;color:#fff;flex-shrink:0}
+.brand-text{display:flex;flex-direction:column}
+.brand-name{font-size:17px;font-weight:700;color:var(--ink)}
+.brand-sub{font-size:12px;color:var(--sub);margin-top:2px}
+.nav-list{flex:1;overflow:auto;padding:4px 0}
+.nav-item{display:flex;align-items:center;gap:12px;padding:12px 14px;margin:2px 6px;border-radius:12px;
+cursor:pointer;color:var(--ink);transition:background .15s, color .15s}
+.nav-item:hover{background:var(--sidebar-hover)}
+.nav-item.active{background:var(--sidebar-active);color:var(--sidebar-active-text);box-shadow:0 2px 8px rgba(107,140,66,.35)}
+.nav-item.active .nav-sub{color:rgba(255,255,255,.85)}
+.nav-icon{font-size:20px;width:26px;text-align:center;flex-shrink:0}
+.nav-text{flex:1;display:flex;flex-direction:column}
+.nav-title{font-weight:600;font-size:14.5px}
+.nav-sub{font-size:11px;color:var(--sub);margin-top:1px}
+.sidebar-footer{padding:10px 8px 0;font-size:11px;color:var(--sub);line-height:1.5}
+/* main */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.topbar{height:64px;background:var(--card);border-bottom:1px solid var(--line);display:flex;
+align-items:center;justify-content:space-between;padding:0 22px;flex-shrink:0}
+.topbar-left{display:flex;align-items:center;gap:14px}
+.menu-toggle{display:none;background:transparent;border:1px solid var(--line);border-radius:8px;
+padding:6px 10px;font-size:18px;cursor:pointer}
+.page-date{font-size:16px;font-weight:600;color:var(--ink)}
+.page-weekday{font-size:13px;color:var(--sub)}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.btn{display:inline-flex;align-items:center;gap:6px;background:var(--chip);color:var(--ink);
+border:1px solid var(--line);border-radius:10px;padding:7px 13px;cursor:pointer;font-size:13px;
+transform:translateY(0);transition:all .15s}
+.btn:hover{background:var(--sidebar-hover)}
+.btn-primary{background:var(--sidebar-active);color:var(--sidebar-active-text);border-color:var(--sidebar-active)}
+.btn-primary:hover{filter:brightness(1.08)}
+.content{flex:1;overflow:auto;padding:22px 26px 40px}
+.section{display:none;max-width:980px;margin:0 auto;animation:fadeIn .25s ease}
+.section.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.section-title{font-size:24px;font-weight:700;margin:0 0 4px}
+.section-sub{color:var(--sub);font-size:14px;margin-bottom:18px}
+.ielts-bar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.ielts-progress{font-size:14px;color:var(--sub)}
+.ielts-progress b{color:var(--accent)}
+.ielts-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+.ielts-card{background:var(--chip);border:1px solid var(--line);border-radius:14px;padding:14px 16px;cursor:pointer;transition:all .15s}
+.ielts-card:hover{box-shadow:var(--shadow);transform:translateY(-2px)}
+.ielts-wordrow{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.ielts-word{font-size:19px;font-weight:700;color:var(--ink)}
+.ielts-spk{border:none;background:transparent;font-size:16px;cursor:pointer;padding:2px 4px;border-radius:8px}
+.ielts-spk:hover{background:var(--sidebar-hover)}
+.ielts-phon{color:var(--sub);font-size:13px;margin:4px 0 6px;font-style:italic}
+.ielts-hint{font-size:12px;color:var(--accent);user-select:none}
+.ielts-back{margin-top:10px;border-top:1px dashed var(--line);padding-top:10px}
+.ielts-pos{font-weight:600;color:var(--green);font-size:14px;margin-bottom:6px}
+.ielts-ex{font-size:13px;color:var(--ink);line-height:1.5;margin-bottom:4px}
+.ielts-exzh{font-size:12px;color:var(--sub);line-height:1.5;margin-bottom:10px}
+.ielts-master{width:100%;border:1px solid var(--line);background:var(--card);color:var(--ink);
+border-radius:10px;padding:7px;cursor:pointer;font-size:13px;transition:all .15s}
+.ielts-master:hover{background:var(--sidebar-hover)}
+.ielts-master.done{background:var(--green);color:#fff;border-color:var(--green)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 20px;
+box-shadow:var(--shadow);margin-bottom:16px}
+.card h2{margin:0 0 12px;font-size:17px;display:flex;align-items:center;gap:8px}
+.badge{font-size:11px;padding:2px 8px;border-radius:20px;background:var(--chip);color:var(--sub)}
+.ok{color:var(--green)}.warn{color:var(--red)}
+ul{list-style:none;margin:0;padding:0}
+li{padding:9px 0;border-bottom:1px dashed var(--line)}
+li:last-child{border-bottom:none}
+a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+.muted{color:var(--sub);font-size:13px}
+.row{display:flex;justify-content:space-between;gap:12px;align-items:baseline}
+.gain{font-weight:700}.up{color:var(--red)}.down{color:var(--green)}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th,td{text-align:left;padding:6px 7px;border-bottom:1px solid var(--line)}
+th{color:var(--sub);font-weight:600;font-size:12px}
+.tag{display:inline-block;background:var(--chip);color:var(--sub);font-size:11px;
+border-radius:6px;padding:1px 7px;margin:1px 2px}
+.src{color:var(--sub);font-size:12px}
+.score{background:var(--chip);border-radius:6px;padding:1px 7px;font-size:12px;color:var(--accent)}
+.pick{background:linear-gradient(135deg,var(--chip),transparent);border-radius:12px;
+padding:14px 16px;margin-bottom:12px}
+.pick .t{font-weight:700;font-size:16px;margin:4px 0}
+.note{font-size:12px;color:var(--sub);margin-top:8px}
+.scroll{max-height:520px;overflow:auto}
+footer{color:var(--sub);font-size:11.5px;text-align:center;padding:18px 0 8px}
+/* 每日计划页 */
+.plan-list{display:grid;gap:10px}
+.plan-item{display:flex;align-items:center;gap:14px;background:var(--card);border:1px solid var(--line);
+border-radius:14px;padding:13px 16px;cursor:pointer;transition:transform .1s, box-shadow .15s}
+.plan-item:hover{transform:translateY(-1px);box-shadow:var(--shadow)}
+.plan-icon{font-size:22px;width:30px;text-align:center}
+.plan-info{flex:1}
+.plan-title{font-weight:600;font-size:15px}
+.plan-desc{font-size:12px;color:var(--sub);margin-top:2px}
+.plan-status{font-size:12px;color:var(--sub);white-space:nowrap}
+.plan-check{width:22px;height:22px;border:2px solid var(--line);border-radius:50%;
+display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff;flex-shrink:0;
+transition:all .15s}
+.plan-check.done{background:var(--sidebar-active);border-color:var(--sidebar-active)}
+.progress-bar{height:8px;background:var(--line);border-radius:4px;overflow:hidden;margin-top:14px}
+.progress-fill{height:100%;background:var(--sidebar-active);border-radius:4px;transition:width .4s ease}
+.progress-text{font-size:12px;color:var(--sub);margin-top:6px}
+/* 我的任务 / 备忘 */
+.todo-wrap{margin-top:22px;border-top:1px solid var(--line);padding-top:18px}
+.todo-add{display:flex;gap:8px;margin:12px 0}
+.todo-input{flex:1;border:1px solid var(--line);border-radius:10px;padding:9px 12px;font-size:14px;
+background:var(--bg);color:var(--ink);font-family:inherit}
+.todo-input:focus{outline:none;border-color:var(--sidebar-active)}
+.todo-list{margin-top:4px}
+.todo-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px dashed var(--line)}
+.todo-item:last-child{border-bottom:none}
+.todo-box{width:20px;height:20px;border:2px solid var(--line);border-radius:6px;flex-shrink:0;
+display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff;cursor:pointer;
+transition:all .15s}
+.todo-box.done{background:var(--sidebar-active);border-color:var(--sidebar-active)}
+.todo-text{flex:1;font-size:14px}
+.todo-text.done{text-decoration:line-through;color:var(--sub)}
+.todo-del{color:var(--sub);cursor:pointer;font-size:14px;padding:2px 6px;border-radius:6px}
+.todo-del:hover{background:var(--sidebar-hover);color:var(--red)}
+.memo{width:100%;min-height:90px;border:1px solid var(--line);border-radius:10px;padding:10px 12px;
+font-size:14px;background:var(--bg);color:var(--ink);font-family:inherit;resize:vertical;line-height:1.5}
+.memo:focus{outline:none;border-color:var(--sidebar-active)}
+.memo-wrap{margin-top:18px}
+/* mobile */
+@media (max-width:860px){
+  .sidebar{position:fixed;left:0;top:0;bottom:0;z-index:100;transform:translateX(-100%)}
+  .sidebar.open{transform:translateX(0)}
+  .overlay{position:fixed;inset:0;background:rgba(0,0,0,.25);z-index:99;display:none}
+  .overlay.open{display:block}
+  .menu-toggle{display:inline-flex}
+  .content{padding:16px}
+  .page-date{font-size:14px}
+}
+/* AIPM 学习路径 (镜像 GitHub 网页) */
+.aipm-hero{margin-bottom:16px}
+.aipm-hero-title{font-size:18px;font-weight:700;margin-bottom:4px}
+.aipm-rail{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px}
+.aipm-chip{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 13px;box-shadow:var(--shadow)}
+.aipm-chip-num{font-size:11px;color:var(--sub);font-weight:600;letter-spacing:.5px}
+.aipm-chip-title{font-size:15px;font-weight:700;margin:3px 0 2px}
+.aipm-chip-meta{font-size:12px;color:var(--sub)}
+.aipm-blocks{display:grid;gap:14px}
+.aipm-block{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 18px;box-shadow:var(--shadow)}
+.aipm-block-head{display:flex;gap:12px;align-items:flex-start;margin-bottom:12px}
+.aipm-block-idx{font-size:12px;font-weight:700;color:var(--sidebar-active-text);background:var(--sidebar-active);
+border-radius:10px;padding:5px 9px;white-space:nowrap;flex-shrink:0}
+.aipm-block-title{font-size:16px;font-weight:700}
+.aipm-tasklist{display:grid;gap:2px}
+.aipm-task{display:flex;align-items:center;gap:10px;padding:9px 4px;border-bottom:1px dashed var(--line);cursor:pointer}
+.aipm-task:last-child{border-bottom:none}
+.aipm-task input{width:18px;height:18px;accent-color:var(--sidebar-active);flex-shrink:0;cursor:pointer}
+.aipm-task-txt{flex:1;font-size:14px}
+.aipm-task input:checked ~ .aipm-task-txt{text-decoration:line-through;color:var(--sub)}
+.aipm-task-time{font-size:12px;color:var(--sub);white-space:nowrap;flex-shrink:0}
+.aipm-task-row{display:flex;align-items:center;gap:8px}
+.aipm-task{flex:1}
+.aipm-video{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:8px;background:var(--bg);border:1px solid var(--line);font-size:15px;text-decoration:none;flex-shrink:0;transition:.15s}
+.aipm-video:hover{background:var(--sidebar-active);border-color:var(--sidebar-active);transform:translateY(-1px)}
+.aipm-task-wrap{padding:4px 0;border-bottom:1px dashed var(--line)}
+.aipm-task-wrap:last-child{border-bottom:none}
+.aipm-note{margin:6px 0 4px 28px;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:6px 12px}
+.aipm-note>summary{cursor:pointer;font-size:13px;font-weight:600;color:var(--sidebar-active);list-style:none}
+.aipm-note>summary::-webkit-details-marker{display:none}
+.aipm-note-sum{font-size:13px;color:var(--fg);margin:6px 0 4px;line-height:1.6}
+.aipm-note-pts{margin:0;padding-left:18px}
+.aipm-note-pts li{font-size:13px;color:var(--fg);line-height:1.7;margin:2px 0}
+.aipm-res-label{font-size:12px;font-weight:600;color:var(--sub);margin:12px 0 6px}
+.aipm-res-list{display:grid;gap:8px}
+.aipm-res{display:flex;align-items:center;gap:10px;background:var(--bg);border:1px solid var(--line);border-radius:12px;
+padding:10px 12px;text-decoration:none;color:var(--ink);transition:transform .1s,box-shadow .15s}
+.aipm-res:hover{transform:translateY(-1px);box-shadow:var(--shadow);text-decoration:none}
+.aipm-res-type{font-size:11px;background:var(--chip);color:var(--sub);border-radius:6px;padding:2px 7px;flex-shrink:0}
+.aipm-res-body{flex:1;display:flex;flex-direction:column}
+.aipm-res-title{font-size:14px;font-weight:600}
+.aipm-res-sub{font-size:12px;color:var(--sub)}
+.aipm-res-arrow{color:var(--sub);font-size:14px}
+.aipm-iv{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:10px 14px;margin-bottom:8px}
+.aipm-iv summary{display:flex;gap:10px;align-items:flex-start;cursor:pointer;list-style:none}
+.aipm-iv summary::-webkit-details-marker{display:none}
+.aipm-iv-tag{font-size:11px;background:var(--chip);color:var(--sub);border-radius:6px;padding:2px 7px;flex-shrink:0;height:fit-content}
+.aipm-iv-q{font-size:14px;font-weight:600;flex:1}
+.aipm-iv-body{padding:10px 0 2px 38px;font-size:13.5px;line-height:1.6}
+.aipm-iv-row{margin-top:8px}
+.aipm-iv-row b{color:var(--ink)}
+@media (max-width:860px){.aipm-rail{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="avatar">🧑‍💻</div>
+      <div class="brand-text">
+        <span class="brand-name">每日工作台</span>
+        <span class="brand-sub">个人学习 & 资讯仪表盘</span>
+      </div>
+    </div>
+    <nav class="nav-list"><div class="nav-item active" data-target="dailyplan" onclick="switchTab(this, 'dailyplan')"><span class="nav-icon">🗓️</span><span class="nav-text"><span class="nav-title">每日计划</span><span class="nav-sub" id="nav-sub-dailyplan">总览</span></span></div><div class="nav-item" data-target="aihot" onclick="switchTab(this, 'aihot')"><span class="nav-icon">🤖</span><span class="nav-text"><span class="nav-title">AI 日报</span><span class="nav-sub" id="nav-sub-aihot">⚠️ 未解析到今日条目</span></span></div><div class="nav-item" data-target="fund" onclick="switchTab(this, 'fund')"><span class="nav-icon">📈</span><span class="nav-text"><span class="nav-title">基金涨幅榜</span><span class="nav-sub" id="nav-sub-fund">✅ 2026-07-24 交易日 20 只</span></span></div><div class="nav-item" data-target="fundnews" onclick="switchTab(this, 'fundnews')"><span class="nav-icon">📰</span><span class="nav-text"><span class="nav-title">基金资讯</span><span class="nav-sub" id="nav-sub-fundnews">✅ 新浪基金 10 条</span></span></div><div class="nav-item" data-target="financial" onclick="switchTab(this, 'financial')"><span class="nav-icon">📄</span><span class="nav-text"><span class="nav-title">财报 &amp; 招股书</span><span class="nav-sub" id="nav-sub-financial">✅ 招股书有 / 财报有</span></span></div><div class="nav-item" data-target="aipm" onclick="switchTab(this, 'aipm')"><span class="nav-icon">🎓</span><span class="nav-text"><span class="nav-title">AIPM 学习</span><span class="nav-sub" id="nav-sub-aipm">✅ 4 阶段 · 18 任务 · 8 面试题</span></span></div><div class="nav-item" data-target="github" onclick="switchTab(this, 'github')"><span class="nav-icon">🐙</span><span class="nav-text"><span class="nav-title">GitHub AI 热点</span><span class="nav-sub" id="nav-sub-github">✅ 8 个(其中AI 8)</span></span></div><div class="nav-item" data-target="xingce" onclick="switchTab(this, 'xingce')"><span class="nav-icon">📝</span><span class="nav-text"><span class="nav-title">行测每日练</span><span class="nav-sub" id="nav-sub-xingce">✅ 行测 第13/15篇</span></span></div><div class="nav-item" data-target="shenlun" onclick="switchTab(this, 'shenlun')"><span class="nav-icon">📖</span><span class="nav-text"><span class="nav-title">申论每日读</span><span class="nav-sub" id="nav-sub-shenlun">✅ 申论 第8/10篇</span></span></div><div class="nav-item" data-target="ielts" onclick="switchTab(this, 'ielts')"><span class="nav-icon">🇬🇧</span><span class="nav-text"><span class="nav-title">雅思单词</span><span class="nav-sub" id="nav-sub-ielts">✅ 第 8/10 组 · 15 词</span></span></div></nav>
+    <div class="sidebar-footer">
+      数据每日 08:00 自动生成<br>生成于 2026-07-26 20:12:36
+    </div>
+  </aside>
+  <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+  <main class="main">
+    <div class="topbar">
+      <div class="topbar-left">
+        <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+        <div>
+          <div class="page-date">2026-07-26 · 星期日</div>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <button class="btn" onclick="showSync()">🔄 同步到手机</button>
+        <button class="btn" onclick="document.documentElement.setAttribute('data-theme', document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark')">🌓 主题</button>
+        <button class="btn" onclick="doRefresh()">↻ 刷新</button>
+      </div>
+    </div>
+    <div class="content">
+      <!-- 每日计划 -->
+      <section class="section active" id="section-dailyplan">
+        <div class="section-title">🗓️ 每日计划</div>
+        <div class="section-sub">完成一项打勾，进度一目了然</div>
+        <div class="card">
+          <h2>今日进度 <span class="badge" id="progress-badge">0/8</span></h2>
+          <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+          <div class="progress-text" id="progress-text">完成 0 项，继续加油 👇</div>
+          <div class="plan-list" style="margin-top:18px"><div class="plan-item" onclick="jumpTo('aihot')"><span class="plan-icon">🤖</span><div class="plan-info"><div class="plan-title">AI 日报</div><div class="plan-desc">⚠️ 未解析到今日条目</div></div><span class="plan-status" id="plan-status-aihot">待完成</span><div class="plan-check" id="check-aihot" data-key="aihot" onclick="event.stopPropagation();toggleCheck('aihot')"></div></div><div class="plan-item" onclick="jumpTo('fund')"><span class="plan-icon">📈</span><div class="plan-info"><div class="plan-title">基金涨幅榜</div><div class="plan-desc">✅ 2026-07-24 交易日 20 只</div></div><span class="plan-status" id="plan-status-fund">待完成</span><div class="plan-check" id="check-fund" data-key="fund" onclick="event.stopPropagation();toggleCheck('fund')"></div></div><div class="plan-item" onclick="jumpTo('fundnews')"><span class="plan-icon">📰</span><div class="plan-info"><div class="plan-title">基金资讯</div><div class="plan-desc">✅ 新浪基金 10 条</div></div><span class="plan-status" id="plan-status-fundnews">待完成</span><div class="plan-check" id="check-fundnews" data-key="fundnews" onclick="event.stopPropagation();toggleCheck('fundnews')"></div></div><div class="plan-item" onclick="jumpTo('financial')"><span class="plan-icon">📄</span><div class="plan-info"><div class="plan-title">财报 &amp; 招股书</div><div class="plan-desc">✅ 招股书有 / 财报有</div></div><span class="plan-status" id="plan-status-financial">待完成</span><div class="plan-check" id="check-financial" data-key="financial" onclick="event.stopPropagation();toggleCheck('financial')"></div></div><div class="plan-item" onclick="jumpTo('aipm')"><span class="plan-icon">🎓</span><div class="plan-info"><div class="plan-title">AIPM 学习</div><div class="plan-desc">✅ 4 阶段 · 18 任务 · 8 面试题</div></div><span class="plan-status" id="plan-status-aipm">待完成</span><div class="plan-check" id="check-aipm" data-key="aipm" onclick="event.stopPropagation();toggleCheck('aipm')"></div></div><div class="plan-item" onclick="jumpTo('github')"><span class="plan-icon">🐙</span><div class="plan-info"><div class="plan-title">GitHub AI 热点</div><div class="plan-desc">✅ 8 个(其中AI 8)</div></div><span class="plan-status" id="plan-status-github">待完成</span><div class="plan-check" id="check-github" data-key="github" onclick="event.stopPropagation();toggleCheck('github')"></div></div><div class="plan-item" onclick="jumpTo('xingce')"><span class="plan-icon">📝</span><div class="plan-info"><div class="plan-title">行测每日练</div><div class="plan-desc">✅ 行测 第13/15篇</div></div><span class="plan-status" id="plan-status-xingce">待完成</span><div class="plan-check" id="check-xingce" data-key="xingce" onclick="event.stopPropagation();toggleCheck('xingce')"></div></div><div class="plan-item" onclick="jumpTo('shenlun')"><span class="plan-icon">📖</span><div class="plan-info"><div class="plan-title">申论每日读</div><div class="plan-desc">✅ 申论 第8/10篇</div></div><span class="plan-status" id="plan-status-shenlun">待完成</span><div class="plan-check" id="check-shenlun" data-key="shenlun" onclick="event.stopPropagation();toggleCheck('shenlun')"></div></div><div class="plan-item" onclick="jumpTo('ielts')"><span class="plan-icon">🇬🇧</span><div class="plan-info"><div class="plan-title">雅思单词</div><div class="plan-desc">✅ 第 8/10 组 · 15 词</div></div><span class="plan-status" id="plan-status-ielts">待完成</span><div class="plan-check" id="check-ielts" data-key="ielts" onclick="event.stopPropagation();toggleCheck('ielts')"></div></div></div>
+        </div>
+        <div class="card todo-wrap">
+          <h2>✏️ 我的任务 <span class="badge">可编辑</span></h2>
+          <div class="todo-add">
+            <input class="todo-input" id="todo-input" placeholder="添加今日任务，回车确认…" onkeydown="if(event.key==='Enter')addTodo()">
+            <button class="btn btn-primary" onclick="addTodo()">＋ 添加</button>
+          </div>
+          <ul class="todo-list" id="todo-list"></ul>
+        </div>
+        <div class="card memo-wrap">
+          <h2>📝 个人备忘</h2>
+          <textarea class="memo" id="memo-input" placeholder="随手记点什么，自动保存…" oninput="saveMemo()"></textarea>
+        </div>
+      </section>
+
+      <!-- AI 日报 -->
+      <section class="section" id="section-aihot">
+        <div class="section-title">🤖 AI 日报</div>
+        <div class="section-sub">aihot.virxact.com 今日精选</div>
+        <div class="card"><ul class="scroll"><li class="muted">今日数据获取失败，请稍后重试或检查网络。</li></ul></div>
+      </section>
+
+      <!-- 基金涨幅 -->
+      <section class="section" id="section-fund">
+        <div class="section-title">📈 基金涨幅榜 Top20</div>
+        <div class="section-sub">天天基金公开排行 · 数据日期：2026-07-24（非交易日显示最近交易日）</div>
+        <div class="card">
+          <table><thead><tr><th>#</th><th>基金</th><th>代码</th><th>日涨幅</th><th>近30天(近1月)</th></tr></thead>
+          <tbody><tr><td>1</td><td><a href="https://fundf10.eastmoney.com/jjjz_017114.html" target="_blank">浦银安盛景气优选混合A</a></td><td class="muted">017114</td><td class="gain down">-1.73%</td><td class="gain up">16.15%</td></tr><tr><td>2</td><td><a href="https://fundf10.eastmoney.com/jjjz_017115.html" target="_blank">浦银安盛景气优选混合C</a></td><td class="muted">017115</td><td class="gain down">-1.73%</td><td class="gain up">16.12%</td></tr><tr><td>3</td><td><a href="https://fundf10.eastmoney.com/jjjz_023570.html" target="_blank">浦银安盛周期优选混合A</a></td><td class="muted">023570</td><td class="gain down">-2.47%</td><td class="gain up">7.56%</td></tr><tr><td>4</td><td><a href="https://fundf10.eastmoney.com/jjjz_023571.html" target="_blank">浦银安盛周期优选混合C</a></td><td class="muted">023571</td><td class="gain down">-2.48%</td><td class="gain up">7.52%</td></tr><tr><td>5</td><td><a href="https://fundf10.eastmoney.com/jjjz_027855.html" target="_blank">浦银安盛资源精选混合C</a></td><td class="muted">027855</td><td class="gain down">-3.46%</td><td class="gain down">-8.18%</td></tr><tr><td>6</td><td><a href="https://fundf10.eastmoney.com/jjjz_027854.html" target="_blank">浦银安盛资源精选混合A</a></td><td class="muted">027854</td><td class="gain down">-3.47%</td><td class="gain down">-8.15%</td></tr><tr><td>7</td><td><a href="https://fundf10.eastmoney.com/jjjz_001470.html" target="_blank">融通通鑫灵活配置混合</a></td><td class="muted">001470</td><td class="gain up">3.01%</td><td class="gain up">2.98%</td></tr><tr><td>8</td><td><a href="https://fundf10.eastmoney.com/jjjz_015381.html" target="_blank">东方兴瑞趋势领航混合A</a></td><td class="muted">015381</td><td class="gain down">-2.54%</td><td class="gain up">12.23%</td></tr><tr><td>9</td><td><a href="https://fundf10.eastmoney.com/jjjz_015382.html" target="_blank">东方兴瑞趋势领航混合C</a></td><td class="muted">015382</td><td class="gain down">-2.54%</td><td class="gain up">12.18%</td></tr><tr><td>10</td><td><a href="https://fundf10.eastmoney.com/jjjz_022320.html" target="_blank">汇添富弘瑞回报混合发起式A</a></td><td class="muted">022320</td><td class="gain down">-3.35%</td><td class="gain up">6.9%</td></tr><tr><td>11</td><td><a href="https://fundf10.eastmoney.com/jjjz_022321.html" target="_blank">汇添富弘瑞回报混合发起式C</a></td><td class="muted">022321</td><td class="gain down">-3.35%</td><td class="gain up">6.86%</td></tr><tr><td>12</td><td><a href="https://fundf10.eastmoney.com/jjjz_025445.html" target="_blank">万家周期视野股票发起式A</a></td><td class="muted">025445</td><td class="gain down">-5.41%</td><td class="gain up">1.53%</td></tr><tr><td>13</td><td><a href="https://fundf10.eastmoney.com/jjjz_025446.html" target="_blank">万家周期视野股票发起式C</a></td><td class="muted">025446</td><td class="gain down">-5.41%</td><td class="gain up">1.5%</td></tr><tr><td>14</td><td><a href="https://fundf10.eastmoney.com/jjjz_001466.html" target="_blank">华富永鑫灵活配置混合A</a></td><td class="muted">001466</td><td class="gain down">-5.02%</td><td class="gain up">1.36%</td></tr><tr><td>15</td><td><a href="https://fundf10.eastmoney.com/jjjz_001467.html" target="_blank">华富永鑫灵活配置混合C</a></td><td class="muted">001467</td><td class="gain down">-5.01%</td><td class="gain up">1.35%</td></tr><tr><td>16</td><td><a href="https://fundf10.eastmoney.com/jjjz_017598.html" target="_blank">华夏景气驱动混合A</a></td><td class="muted">017598</td><td class="gain down">-4.36%</td><td class="gain down">-3.81%</td></tr><tr><td>17</td><td><a href="https://fundf10.eastmoney.com/jjjz_017599.html" target="_blank">华夏景气驱动混合C</a></td><td class="muted">017599</td><td class="gain down">-4.37%</td><td class="gain down">-3.86%</td></tr><tr><td>18</td><td><a href="https://fundf10.eastmoney.com/jjjz_021873.html" target="_blank">中欧黄金股指数A</a></td><td class="muted">021873</td><td class="gain down">-4.35%</td><td class="gain up">4.85%</td></tr><tr><td>19</td><td><a href="https://fundf10.eastmoney.com/jjjz_021874.html" target="_blank">中欧黄金股指数C</a></td><td class="muted">021874</td><td class="gain down">-4.35%</td><td class="gain up">4.84%</td></tr><tr><td>20</td><td><a href="https://fundf10.eastmoney.com/jjjz_021362.html" target="_blank">易方达黄金股指数发起式A</a></td><td class="muted">021362</td><td class="gain down">-4.43%</td><td class="gain up">4.6%</td></tr></tbody></table>
+        </div>
+      </section>
+
+      <!-- 基金资讯 -->
+      <section class="section" id="section-fundnews">
+        <div class="section-title">📰 基金资讯</div>
+        <div class="section-sub">每日基金要闻</div>
+        <div class="card"><ul class="scroll"><li><a href="https://finance.sina.com.cn/money/fund/etf/2026-07-26/doc-inikcucz3593257.shtml" target="_blank">吃喝板块基金持仓创新低！白酒、大众品集体走弱，华宝基金食品饮料ETF（515710）收跌1.6%</a></li><li><a href="https://finance.sina.com.cn/money/fund/etf/2026-07-26/doc-inikcucw8661736.shtml" target="_blank">科技股恐慌退潮？半导体率先企稳反弹！机构：科技板块和AI仍是下半年的市场主线</a></li><li><a href="https://finance.sina.com.cn/money/fund/etf/2026-07-26/doc-inikcucw8661366.shtml" target="_blank">长鑫科技周一上市，影响如何？科创芯片ETF华宝逆市冲高近3%！港股通信息技术ETF华宝近60日狂揽18亿元</a></li><li><a href="https://finance.sina.com.cn/money/fund/etf/2026-07-26/doc-inikcuef0942199.shtml" target="_blank">AI硬件将重回上涨主线？长鑫科技上市扩产，半导体设备率先受益！电子ETF华宝（515260）逆市摸高1.34%</a></li><li><a href="https://finance.sina.com.cn/money/fund/etf/2026-07-26/doc-inikcucw8659608.shtml" target="_blank">长鑫科技重磅首秀，市场将如何演绎？</a></li><li><a href="https://finance.sina.com.cn/money/fund/etf/2026-07-24/doc-iniixfxy9285339.shtml" target="_blank">下半场，聚焦这两个线索！长鑫即将上市，半导体设备率先受益！科创芯片ETF华宝（589190）逆市冲高近3%</a></li><li><a href="https://finance.sina.com.cn/money/fund/reits/2026-07-02/doc-inifkiyh2656217.shtml" target="_blank">理财公司REITs投资调研： 从“打新增厚”到</a></li><li><a href="https://finance.sina.com.cn/money/fund/fundzmt/2022-10-11/doc-imqmmthc0424536.shtml" target="_blank">基金冷知识：谁最早重仓了茅台和宁德时代？华夏基金爱茅台 银华李晓星选宁王</a></li><li><a href="http://finance.sina.com.cn/fund/quotes/000362/bc.shtml" target="_blank">国泰纳指指数QDII</a></li><li><a href="https://finance.sina.com.cn/money/fund/jjzl/2026-07-26/doc-inikekzq8484846.shtml" target="_blank">基金二季报发布完毕，三步快速了解基金季报关键信息 | 图说理财</a></li></ul></div>
+      </section>
+
+      <!-- 财报招股书 -->
+      <section class="section" id="section-financial">
+        <div class="section-title">📄 每日财报 & 招股书</div>
+        <div class="section-sub">东方财富公告</div>
+        <div class="card"><div class="pick"><div class="muted">📘 今日招股书 · 2026-07-24</div><div class="t"><a href="https://data.eastmoney.com/notices/detail/301677/AN202607231827295690.html" target="_blank">欣兴工具:首次公开发行股票并在创业板上市招股说明书</a></div><div class="muted">欣兴工具 (301677)</div></div><div class="pick"><div class="muted">📊 今日财报 · 2026-07-25</div><div class="t"><a href="https://data.eastmoney.com/notices/detail/603727/AN202607241827318954.html" target="_blank">博迈科:博迈科海洋工程股份有限公司2026年半年度报告</a></div><div class="muted">博迈科 (603727)</div></div></div>
+      </section>
+
+      <!-- AIPM -->
+      <section class="section" id="section-aipm">
+        <div class="section-title">🎓 AIPM 学习</div>
+        <div class="section-sub">完整镜像 GitHub 学习路径网页 · 四阶段任务 + 推荐资源 + 高频面试题</div>
+        <div class="card"><div class="aipm-hero"><div class="aipm-hero-title">🎓 AI 产品管理学习路径</div><div class="muted">完整镜像 github.com/xiaokaishuibuxing/aipm-learning-path · 4 阶段 / 18 任务 / 8 面试题 · <a href="https://github.com/xiaokaishuibuxing/aipm-learning-path" target="_blank" rel="noopener">在 GitHub 打开原网页 ↗</a></div></div><div class="aipm-rail"><div class="aipm-chip"><div class="aipm-chip-num">阶段 01</div><div class="aipm-chip-title">基础认知</div><div class="aipm-chip-meta">4 周 · 入门</div></div><div class="aipm-chip"><div class="aipm-chip-num">阶段 02</div><div class="aipm-chip-title">核心技能</div><div class="aipm-chip-meta">4 周 · 核心</div></div><div class="aipm-chip"><div class="aipm-chip-num">阶段 03</div><div class="aipm-chip-title">实战项目</div><div class="aipm-chip-meta">2 周 · 实战</div></div><div class="aipm-chip"><div class="aipm-chip-num">阶段 04</div><div class="aipm-chip-title">求职冲刺</div><div class="aipm-chip-meta">2 周 · 冲刺</div></div></div><div class="aipm-blocks"><div class="aipm-block" id="aipm-phase1"><div class="aipm-block-head"><span class="aipm-block-idx">阶段 01</span><div><div class="aipm-block-title">基础认知 · 4周 · 入门</div><div class="muted">理解 LLM 技术栈与 AI 产品生态，建立正确认知框架</div></div></div><div class="aipm-tasklist"><div class="aipm-task-wrap"><div class="aipm-task-row"><label class="aipm-task"><input type="checkbox" data-key="aipm-1-0"><span class="aipm-task-txt">阅读 Transformer 论文（Attention Is All You Need）摘要 + 图解</span><span class="aipm-task-time">约 3 小时</span></label><a class="aipm-video" href="https://www.youtube.com/results?search_query=%E9%98%85%E8%AF%BB%20Transformer%20%E8%AE%BA%E6%96%87%EF%BC%88Attention%20Is%20All%20You%20Need%EF%BC%89%E6%91%98%E8%A6%81%20%2B%20%E5%9B%BE%E8%A7%A3" target="_blank" rel="noopener" title="查看相关视频教程">📺</a></div><details class="aipm-note"><summary>📖 学习要点（5 条）</summary><div class="aipm-note-sum">Transformer 是 GPT/Claude/Llama 等所有主流大模型的架构基石，核心是「自注意力机制」。</div><ul class="aipm-note-pts"><li>自注意力(Self-Attention)：让每个 token 直接关注序列中所有其他 token，通过 Q/K/V 三个向量计算注意力权重，解决长距离依赖问题。</li><li>多头注意力(Multi-Head)：并行多组 Q/K/V，分别捕捉语法、指代、语义等不同子空间的关系。</li><li>位置编码(Positional Encoding)：抛弃 RNN 时序后，必须用正弦/可学习向量告诉模型「词的顺序」。</li><li>残差连接 + LayerNorm + 前馈网络(FFN)：保证深层网络可稳定训练的标准结构。</li><li>关键收益：完全并行、训练快、长文本建模强——这是后续 Scaling Law 与预训练范式的前提。</li></ul></details></div><div class="aipm-task-wrap"><div class="aipm-task-row"><label class="aipm-task"><input type="checkbox" data-key="aipm-1-1"><span class="aipm-task-txt">完成 Anthropic Academy 入门系列（4 门基础课）</span><span class="aipm-task-time">约 4 小时</span></label><a class="aipm-video" href="https://www.youtube.com/results?search_query=%E5%AE%8C%E6%88%90%20Anthropic%20Academy%20%E5%85%A5%E9%97%A8%E7%B3%BB%E5%88%97%EF%BC%884%20%E9%97%A8%E5%9F%BA%E7%A1%80%E8%AF%BE%EF%BC%89" target="_blank" rel="noopener" title="查看相关视频教程">📺</a></div><details class="aipm-note"><summary>📖 学习要点（4 条）</summary><div class="aipm-note-sum">建立对 Claude 能力与边界的直观认知，比纯理论更贴近实战。</div><ul class="aipm-note-pts"><li>课程通常覆盖：大模型能做什么/不能做什么、Prompt 基础、Tool Use 入门、Agent 概念。</li><li>重点建立「能力边界」直觉：擅长生成与推理，不擅长精确计数、实时事实、处理保密信息。</li><li>动手跑通每个示例，记录哪些任务模型表现好、哪些容易翻车。</li><li>把术语沉淀成自己的词汇表（prompt / context window / token / system prompt …）。</li></ul></details></div><div class="aipm-task-wrap"><div class="aipm-task-row"><label class="aipm-task"><input type="checkbox" data-key="aipm-1-2"><span class="aipm-task-txt">阅读 RAG 综述，理解检索增强生成架构</span><span class="aipm-task-time">约 3 小时</span></label><a class="aipm-video" href="https://www.youtube.com/results?search_query=%E9%98%85%E8%AF%BB%20RAG%20%E7%BB%BC%E8%BF%B0%EF%BC%8C%E7%90%86%E8%A7%A3%E6%A3%80%E7%B4%A2%E5%A2%9E%E5%BC%BA%E7%94%9F%E6%88%90%E6%9E%B6%E6%9E%84" target="_blank" rel="noopener" title="查看相关视频教程">📺</a></div><details class="aipm-note"><summary>📖 学习要点（4 条）</summary><div class="aipm-note-sum">RAG 是让 LLM「用上外部知识」的最常用方案，核心是「先检索、再生成」。</div><ul class="aipm-note-pts"><li>流程：文档切分(Chunk) → 向量化(Embedding) → 存入向量库 → 提问时检索 Top-K → 拼进 Prompt 让 LLM 回答。</li><li>为什么用 RAG：弥补模型知识截止、减少幻觉、让答案可溯源。</li><li>关键旋钮：切分粒度、Embedding 模型选型、检索召回率(Recall)、重排(Re-rank)、上下文压缩。</li><li>局限：检索质量决定天花板；需配套评估检索命中与答案忠实度。</li></ul></details></div><div class="aipm-task-wrap"><div class="aipm-task-row"><label class="aipm-task"><input type="checkbox" data-key="aipm-1-3"><span class="aipm-task-txt">完成一篇学习笔记：「一个 PM 眼中的 LLM 技术栈」</span><span class="aipm-task-time">约 2 小时</span></label><a class="aipm-video" href="https://www.youtube.com/results?search_query=%E5%AE%8C%E6%88%90%E4%B8%80%E7%AF%87%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%9A%E3%80%8C%E4%B8%80%E4%B8%AA%20PM%20%E7%9C%BC%E4%B8%AD%E7%9A%84%20LLM%20%E6%8A%80%E6%9C%AF%E6%A0%88%E3%80%8D" target="_blank" rel="noopener" title="查看相关视频教程">📺</a></div><details class="aipm-note"><summary>📖 学习要点（4 条）</summary><div class="aipm-note-sum">用 PM 视角把零散概念串成一张技术栈地图，便于和工程/算法沟通。</div><ul class="aipm-note-pts"><li>分层梳理：基础模型层(基座/微调) → 推理部署层(推理框架/量化) → 应用层(RAG/Agent/编排) → 评测层(Eval/监控)。</li><li>每个层面对应「PM 要关心的决策点」：成本、延迟、可控性、可观测性。</li><li>用一张图表达数据如何从原始文档流向用户答案。</li><li>产出：一页笔记 + 一张架构草图，作为后续项目的参考基线。</li></ul></details></div></div><div class="aipm-res-label">推荐资源</div><div class="aipm-res-list"><a class="aipm-res" href="https://docs.claude.com" target="_blank" rel="noopener"><span class="aipm-res-type">文档</span><span class="aipm-res-body"><span class="aipm-res-title">Anthropic 官方文档</span><span class="aipm-res-sub">API、Agent SDK、MCP 协议规范</span></span><span class="aipm-res-arrow">↗</span></a><a class="aipm-res" href="https://www.anthropic.com/learn" target="_blank" rel="noopener"><span class="aipm-res-type">课程</span><span class="aipm-res-body"><span class="aipm-res-title">Anthropic Academy</span><span class="aipm-res-sub">17-18 门免费认证课程</span></span><span class="aipm-res-arrow">↗</span></a></div></div><div class="aipm-block" id="aipm-phase2"><div class="aipm-block-head"><span class="aipm-block-idx">阶段 02</span><div><div class="aipm-block-title">核心技能 · 4周 · 核心</div><div class="muted">Prompt 工程、Agent 设计、MCP 协议，掌握 AI PM 核心能力</div></div></div><div class="aipm-tasklist"><div class="aipm-task-wrap"><div class="aipm-task-row"><label class="aipm-task"><input type="checkbox" data-key="aipm-2-0"><span class="aipm-task-txt">精读 Anthropic Prompt Engineering Guide</span><span class="aipm-task-time">约 3 小时</span></label><a class="aipm-video" href="https://www.youtube.com/results?search_query=%E7%B2%BE%E8%AF%BB%20Anthropic%20Prompt%20Engineering%20Guide" target="_blank" rel="noopener" title="查看相关视频教程">📺</a></div><details class="aipm-note"><summary>📖 学习要点（4 条）</summary><div class="aipm-note-sum">掌握面向 Claude 的高质量 Prompt 写法，这是 AI PM 的硬基本功。</div><ul class="aipm-note-pts"><li>清晰的任务描述 + 角色设定(system prompt) + 输出格式约束。</li><li>技巧：few-shot（给示例）、chain-of-thought（先思考再答）、结构化输出(JSON / XML)。</li><li>善用官方工具：Prompt Generator 与 Prompt Library 直接套用成熟模版。</li><li>原则：具体优于抽象；把「好答案长什么样」写清楚；用分隔符隔离指令与内容。</li></ul></details></div><div class="aipm-task-wrap"><div class="aipm-task-row"><label class="aipm-task"><input type="checkbox" data-key="aipm-2-1"><span class="aipm-task-txt">阅读 Claude Agent SDK 文档，理解 agent loop 和 tool use</span><span class="aipm-task-time">约 3 小时</span></label><a class="aipm-video" href="https://www.youtube.com/results?search_query=%E9%98%85%E8%AF%BB%20Claude%20Agent%20SDK%20%E6%96%87%E6%A1%A3%EF%BC%8C%E7%90%86%E8%A7%A3%20agent%20loop%20%E5%92%8C%20tool%20use" target="_blank" rel="noopener" title="查看相关视频教程">📺</a></div><details class="aipm-note"><summary>📖 学习要点（4 条）</summary><div class="aipm-note-sum">Agent = 模型在「思考—调用工具—观察结果」的循环里自主完成任务。</div><ul class="aipm-note-pts"><li>Agent Loop：LLM 输出 tool_call → 系统执行工具 → 结果回灌上下文 → 模型决定下一步，直到完成。</li><li>Tool Use：把「查数据库/调 API/跑代码」封装成工具，模型只决定何时调用、传什么参数。</li><li>关键设计：工具描述要清晰（模型靠描述决定用不用）、结果要可解析、要有终止条件防死循环。</li><li>Anthropic 官方强调「less structure, more tools」——多给工具，少写死流程。</li></ul></details></div><div class="aipm-task-wrap"><div class="aipm-task-row"><label class="aipm-task"><input type="checkbox" data-key="aipm-2-2"><span class="aipm-task-txt">搭建一个 Claude Agent 原型——使用 Tool Use 完成一个实际任务</span><span class="aipm-task-time">约 4 小时</span></label><a class="aipm-video" href="https://www.youtube.com/results?search_query=%E6%90%AD%E5%BB%BA%E4%B8%80%E4%B8%AA%20Claude%20Agent%20%E5%8E%9F%E5%9E%8B%E2%80%94%E2%80%94%E4%BD%BF%E7%94%A8%20Tool%20Use%20%E5%AE%8C%E6%88%90%E4%B8%80%E4%B8%AA%E5%AE%9E%E9%99%85%E4%BB%BB%E5%8A%A1" target="_blank" rel="noopener" title="查看相关视频教程">📺</a></div><details class="aipm-note"><summary>📖 学习要点（4 条）</summary><div class="aipm-note-sum">动手把 Agent Loop 跑通，比看文档印象深十倍。</div><ul class="aipm-note-pts"><li>选一个真实小任务（如：根据一句话查询天气并生成提醒）。</li><li>定义 1-2 个工具（function schema：name / description / input_schema）。</li><li>实现循环：调用 Claude → 解析 tool_use → 执行 → 以 tool_result 回传 → 继续。</li><li>验证：让模型在缺少信息时主动调用工具，而非编造答案。</li></ul></details></div><div class="aipm-task-wrap"><div class="aipm-task-row"><label class="aipm-task"><input type="checkbox" data-key="aipm-2-3"><span class="aipm-task-txt">阅读 MCP 协议规范，搭建一个 MCP Server 并集成到 Agent</span><span class="aipm-task-time">约 2 小时</span></label><a class="aipm-video" href="https://www.youtube.com/results?search_query=%E9%98%85%E8%AF%BB%20MCP%20%E5%8D%8F%E8%AE%AE%E8%A7%84%E8%8C%83%EF%BC%8C%E6%90%AD%E5%BB%BA%E4%B8%80%E4%B8%AA%20MCP%20Server%20%E5%B9%B6%E9%9B%86%E6%88%90%E5%88%B0%20Agent" target="_blank" rel="noopener" title="查看相关视频教程">📺</a></div><details class="aipm-note"><summary>📖 学习要点（4 条）</summary><div class="aipm-note-sum">MCP(Model Context Protocol) 是「统一工具接口」标准，让 Agent 即插即用地连数据源/软件。</div><ul class="aipm-note-pts"><li>角色：MCP Server 暴露资源(Resources)/工具(Tools)/提示(Prompts)；MCP Client（如 Claude Desktop）消费。</li><li>价值：一次写好 Server，任意支持 MCP 的客户端都能用，避免重复对接。</li><li>动手：用官方 SDK 写一个最小 Server（如读取本地文件/调一个 API），再接到客户端。</li><li>注意权限与边界：Server 能访问什么、是否需用户确认后才执行写操作。</li></ul></details></div><div class="aipm-task-wrap"><div class="aipm-task-row"><label class="aipm-task"><input type="checkbox" data-key="aipm-2-4"><span class="aipm-task-txt">整理 Prompt 模版库 + Agent 设计模式笔记</span><span class="aipm-task-time">约 2 小时</span></label><a class="aipm-video" href="https://www.youtube.com/results?search_query=%E6%95%B4%E7%90%86%20Prompt%20%E6%A8%A1%E7%89%88%E5%BA%93%20%2B%20Agent%20%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E7%AC%94%E8%AE%B0" target="_blank" rel="noopener" title="查看相关视频教程">📺</a></div><details class="aipm-note"><summary>📖 学习要点（4 条）</summary><div class="aipm-note-sum">把前几周的经验沉淀成可复用资产，是 PM 的「方法论库」。</div><ul class="aipm-note-pts"><li>Prompt 模版库：按场景分类（摘要/抽取/分类/对话/代码），每条记录有效写法与坑。</li><li>Agent 设计模式：ReAct(推理+行动)、Plan-Execute(先规划再执行)、Reflection(自我复盘)、Multi-Agent(分工协作)。</li><li>每类模式记「适用场景 + 优缺点 + 你踩过的坑」。</li><li>这份资产可直接进作品集，展示你的工程化思维。</li></ul></details></div></div><div class="aipm-res-label">推荐资源</div><div class="aipm-res-list"><a class="aipm-res" href="https://docs.claude.com/en/docs/build-with-claude/prompt-engineering" target="_blank" rel="noopener"><span class="aipm-res-type">文档</span><span class="aipm-res-body"><span class="aipm-res-title">Prompt Engineering Guide</span><span class="aipm-res-sub">Anthropic 官方 Prompt 工程指南</span></span><span class="aipm-res-arrow">↗</span></a><a class="aipm-res" href="https://modelcontextprotocol.io" target="_blank" rel="noopener"><span class="aipm-res-type">协议</span><span class="aipm-res-body"><span class="aipm-res-title">MCP 官方规范</span><span class="aipm-res-sub">开放协议标准文档</span></span><span class="aipm-res-arrow">↗</span></a><a class="aipm-res" href="https://langchain.com/docs" target="_blank" rel="noopener"><span class="aipm-res-type">文档</span><span class="aipm-res-body"><span class="aipm-res-title">LangGraph 文档</span><span class="aipm-res-sub">图状态机、checkpointing、human-in-the-loop</span></span><span class="aipm-res-arrow">↗</span></a></div></div><div class="aipm-block" id="aipm-phase3"><div class="aipm-block-head"><span class="aipm-block-idx">阶段 03</span><div><div class="aipm-block-title">实战项目 · 2周 · 实战</div><div class="muted">独立完成一个端到端 AI 产品，从需求到 Eval 全流程</div></div></div><div class="aipm-tasklist"><div class="aipm-task-wrap"><div class="aipm-task-row"><label class="aipm-task"><input type="checkbox" data-key="aipm-3-0"><span class="aipm-task-txt">确定项目选题 + 完成 PRD（AI 产品版本）</span><span class="aipm-task-time">约 3 小时</span></label><a class="aipm-video" href="https://www.youtube.com/results?search_query=%E7%A1%AE%E5%AE%9A%E9%A1%B9%E7%9B%AE%E9%80%89%E9%A2%98%20%2B%20%E5%AE%8C%E6%88%90%20PRD%EF%BC%88AI%20%E4%BA%A7%E5%93%81%E7%89%88%E6%9C%AC%EF%BC%89" target="_blank" rel="noopener" title="查看相关视频教程">📺</a></div><details class="aipm-note"><summary>📖 学习要点（4 条）</summary><div class="aipm-note-sum">用 PM 的方式定义一个「真的能用 AI 解决」的问题。</div><ul class="aipm-note-pts"><li>选题三问：痛点真实吗？AI 是更优解吗？数据/工具可达吗？</li><li>PRD 要点：用户与场景、AI 能力边界假设、核心流程(Agent/RAG)、成功指标、风险与回退。</li><li>重点写清「为什么不用传统规则方案」——体现 AI 的独特价值。</li><li>产出：一份能给工程师直接开工的 PRD。</li></ul></details></div><div class="aipm-task-wrap"><div class="aipm-task-row"><label class="aipm-task"><input type="checkbox" data-key="aipm-3-1"><span class="aipm-task-txt">实现 Agent 原型——至少包含 2 个 Tool Use + 1 个 MCP 集成</span><span class="aipm-task-time">约 8 小时</span></label><a class="aipm-video" href="https://www.youtube.com/results?search_query=%E5%AE%9E%E7%8E%B0%20Agent%20%E5%8E%9F%E5%9E%8B%E2%80%94%E2%80%94%E8%87%B3%E5%B0%91%E5%8C%85%E5%90%AB%202%20%E4%B8%AA%20Tool%20Use%20%2B%201%20%E4%B8%AA%20MCP%20%E9%9B%86%E6%88%90" target="_blank" rel="noopener" title="查看相关视频教程">📺</a></div><details class="aipm-note"><summary>📖 学习要点（4 条）</summary><div class="aipm-note-sum">把 PRD 落地成一个可演示的 Agent，验证技术可行性。</div><ul class="aipm-note-pts"><li>设计 2 个以上工具覆盖核心动作（如检索知识、调用业务 API）。</li><li>至少 1 个工具走 MCP，验证「标准协议」带来的可替换性。</li><li>处理边界：工具失败时的回退、用户确认、超时与重试。</li><li>交付：能端到端跑通一个用户任务的 Demo。</li></ul></details></div><div class="aipm-task-wrap"><div class="aipm-task-row"><label class="aipm-task"><input type="checkbox" data-key="aipm-3-2"><span class="aipm-task-txt">搭建 Eval 框架——定义评估维度、收集测试用例、跑一轮评估</span><span class="aipm-task-time">约 3 小时</span></label><a class="aipm-video" href="https://www.youtube.com/results?search_query=%E6%90%AD%E5%BB%BA%20Eval%20%E6%A1%86%E6%9E%B6%E2%80%94%E2%80%94%E5%AE%9A%E4%B9%89%E8%AF%84%E4%BC%B0%E7%BB%B4%E5%BA%A6%E3%80%81%E6%94%B6%E9%9B%86%E6%B5%8B%E8%AF%95%E7%94%A8%E4%BE%8B%E3%80%81%E8%B7%91%E4%B8%80%E8%BD%AE%E8%AF%84%E4%BC%B0" target="_blank" rel="noopener" title="查看相关视频教程">📺</a></div><details class="aipm-note"><summary>📖 学习要点（4 条）</summary><div class="aipm-note-sum">没有评估，AI 产品就是「凭感觉调参」。Eval 是 AI PM 的核心专业度。</div><ul class="aipm-note-pts"><li>评估维度：准确性、忠实度(不胡编)、相关性、安全性、延迟/成本。</li><li>用例集：覆盖正常/边界/对抗样本，至少 20-50 条，带标准答案或评分标准。</li><li>方法：自动打分(LLM-as-judge) + 人工抽检结合。</li><li>产出：一轮评估报告和「改版前后对比」基线。</li></ul></details></div><div class="aipm-task-wrap"><div class="aipm-task-row"><label class="aipm-task"><input type="checkbox" data-key="aipm-3-3"><span class="aipm-task-txt">撰写项目 README——包含架构图、使用说明、Eval 结果</span><span class="aipm-task-time">约 2 小时</span></label><a class="aipm-video" href="https://www.youtube.com/results?search_query=%E6%92%B0%E5%86%99%E9%A1%B9%E7%9B%AE%20README%E2%80%94%E2%80%94%E5%8C%85%E5%90%AB%E6%9E%B6%E6%9E%84%E5%9B%BE%E3%80%81%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E%E3%80%81Eval%20%E7%BB%93%E6%9E%9C" target="_blank" rel="noopener" title="查看相关视频教程">📺</a></div><details class="aipm-note"><summary>📖 学习要点（4 条）</summary><div class="aipm-note-sum">README 是作品的门面，决定面试官/协作者 5 分钟内的判断。</div><ul class="aipm-note-pts"><li>架构图：用一张图讲清 用户 → Agent Loop → 工具/MCP → 模型 的数据流。</li><li>使用说明：环境、运行步骤、示例对话。</li><li>Eval 结果：贴出关键指标与改进对比，证明你「用数据驱动迭代」。</li><li>诚实写局限：哪些没做好、下一步怎么优化。</li></ul></details></div></div><div class="aipm-res-label">推荐资源</div><div class="aipm-res-list"><a class="aipm-res" href="https://github.com/anthropics/claude-agent-sdk-python" target="_blank" rel="noopener"><span class="aipm-res-type">仓库</span><span class="aipm-res-body"><span class="aipm-res-title">Claude Agent SDK</span><span class="aipm-res-sub">Python SDK for building Claude agents</span></span><span class="aipm-res-arrow">↗</span></a><a class="aipm-res" href="https://github.com/anthropics/claude-cookbooks" target="_blank" rel="noopener"><span class="aipm-res-type">仓库</span><span class="aipm-res-body"><span class="aipm-res-title">Claude Cookbooks</span><span class="aipm-res-sub">评估框架 Notebook 参考</span></span><span class="aipm-res-arrow">↗</span></a></div></div><div class="aipm-block" id="aipm-phase4"><div class="aipm-block-head"><span class="aipm-block-idx">阶段 04</span><div><div class="aipm-block-title">求职冲刺 · 2周 · 冲刺</div><div class="muted">简历打磨、面试准备、作品集呈现，完成从学到用的跃迁</div></div></div><div class="aipm-tasklist"><div class="aipm-task-wrap"><div class="aipm-task-row"><label class="aipm-task"><input type="checkbox" data-key="aipm-4-0"><span class="aipm-task-txt">重写简历——将 AI PM 能力和项目经验突出放在首位</span><span class="aipm-task-time">约 2 小时</span></label><a class="aipm-video" href="https://www.youtube.com/results?search_query=%E9%87%8D%E5%86%99%E7%AE%80%E5%8E%86%E2%80%94%E2%80%94%E5%B0%86%20AI%20PM%20%E8%83%BD%E5%8A%9B%E5%92%8C%E9%A1%B9%E7%9B%AE%E7%BB%8F%E9%AA%8C%E7%AA%81%E5%87%BA%E6%94%BE%E5%9C%A8%E9%A6%96%E4%BD%8D" target="_blank" rel="noopener" title="查看相关视频教程">📺</a></div><details class="aipm-note"><summary>📖 学习要点（4 条）</summary><div class="aipm-note-sum">把「我会用 AI 做产品」变成简历上可验证的事实。</div><ul class="aipm-note-pts"><li>顶部摘要直接写 AI PM 定位 + 代表项目 + 量化结果。</li><li>项目经历用「背景-动作-结果」结构，强调你设计的 Agent/RAG/Eval。</li><li>技能栏区分「会用」与「能设计」：Prompt/Agent/RAG/Eval 写清到什么程度。</li><li>用作品集链接(GitHub)替代空泛描述。</li></ul></details></div><div class="aipm-task-wrap"><div class="aipm-task-row"><label class="aipm-task"><input type="checkbox" data-key="aipm-4-1"><span class="aipm-task-txt">准备 AI PM 面试题库——至少 10 道高频题 + 答题框架</span><span class="aipm-task-time">约 2 小时</span></label><a class="aipm-video" href="https://www.youtube.com/results?search_query=%E5%87%86%E5%A4%87%20AI%20PM%20%E9%9D%A2%E8%AF%95%E9%A2%98%E5%BA%93%E2%80%94%E2%80%94%E8%87%B3%E5%B0%91%2010%20%E9%81%93%E9%AB%98%E9%A2%91%E9%A2%98%20%2B%20%E7%AD%94%E9%A2%98%E6%A1%86%E6%9E%B6" target="_blank" rel="noopener" title="查看相关视频教程">📺</a></div><details class="aipm-note"><summary>📖 学习要点（4 条）</summary><div class="aipm-note-sum">AI PM 面试既考产品 Sense，也考对技术边界的理解。</div><ul class="aipm-note-pts"><li>高频题类型：如何设计 AI 功能、如何评估 AI 质量、RAG vs 微调怎么选、Agent 失败怎么排查、成本与体验如何权衡。</li><li>答题框架：先澄清目标与约束，再给方案，最后说如何度量与迭代。</li><li>准备 1-2 个你真实做过的案例，能讲清决策链路。</li><li>技术题不要求写代码，但要能和技术同学对齐语言。</li></ul></details></div><div class="aipm-task-wrap"><div class="aipm-task-row"><label class="aipm-task"><input type="checkbox" data-key="aipm-4-2"><span class="aipm-task-txt">整理作品集——项目 README + Eval Report + 学习路径证明</span><span class="aipm-task-time">约 2 小时</span></label><a class="aipm-video" href="https://www.youtube.com/results?search_query=%E6%95%B4%E7%90%86%E4%BD%9C%E5%93%81%E9%9B%86%E2%80%94%E2%80%94%E9%A1%B9%E7%9B%AE%20README%20%2B%20Eval%20Report%20%2B%20%E5%AD%A6%E4%B9%A0%E8%B7%AF%E5%BE%84%E8%AF%81%E6%98%8E" target="_blank" rel="noopener" title="查看相关视频教程">📺</a></div><details class="aipm-note"><summary>📖 学习要点（4 条）</summary><div class="aipm-note-sum">作品集是 AI PM 求职的硬通货，比简历更有说服力。</div><ul class="aipm-note-pts"><li>三件套：可运行的项目(README) + 评估证据(Eval Report) + 学习轨迹(本路径本身)。</li><li>每个作品写「我负责什么、用了什么 AI 能力、结果如何度量」。</li><li>形式：GitHub 仓库 + 一份图文 README，方便手机/网页查看。</li><li>强调「工程化思维」：你不是用工具，而是在设计系统。</li></ul></details></div><div class="aipm-task-wrap"><div class="aipm-task-row"><label class="aipm-task"><input type="checkbox" data-key="aipm-4-3"><span class="aipm-task-txt">完成至少 2 次模拟面试（可以找朋友或 AI 模拟）</span><span class="aipm-task-time">约 1 小时</span></label><a class="aipm-video" href="https://www.youtube.com/results?search_query=%E5%AE%8C%E6%88%90%E8%87%B3%E5%B0%91%202%20%E6%AC%A1%E6%A8%A1%E6%8B%9F%E9%9D%A2%E8%AF%95%EF%BC%88%E5%8F%AF%E4%BB%A5%E6%89%BE%E6%9C%8B%E5%8F%8B%E6%88%96%20AI%20%E6%A8%A1%E6%8B%9F%EF%BC%89" target="_blank" rel="noopener" title="查看相关视频教程">📺</a></div><details class="aipm-note"><summary>📖 学习要点（4 条）</summary><div class="aipm-note-sum">面试是技能，靠练出来的。</div><ul class="aipm-note-pts"><li>每次模拟后复盘：哪类问题卡壳、表述是否清晰、案例是否讲透。</li><li>用 AI 模拟可高频、低成本，重点练「结构化表达」。</li><li>记录自己的回答，找出口头禅和逻辑漏洞。</li><li>目标：对任何 AI PM 问题都能 30 秒内给出框架性回答。</li></ul></details></div><div class="aipm-task-wrap"><div class="aipm-task-row"><label class="aipm-task"><input type="checkbox" data-key="aipm-4-4"><span class="aipm-task-txt">至少投递 / 内推 3 个目标岗位</span><span class="aipm-task-time">约 1 小时</span></label><a class="aipm-video" href="https://www.youtube.com/results?search_query=%E8%87%B3%E5%B0%91%E6%8A%95%E9%80%92%20/%20%E5%86%85%E6%8E%A8%203%20%E4%B8%AA%E7%9B%AE%E6%A0%87%E5%B2%97%E4%BD%8D" target="_blank" rel="noopener" title="查看相关视频教程">📺</a></div><details class="aipm-note"><summary>📖 学习要点（4 条）</summary><div class="aipm-note-sum">把前面的积累变成真实机会。</div><ul class="aipm-note-pts"><li>岗位筛选：看 JD 里 AI 能力要求是否匹配你的项目。</li><li>内推优先：用作品集做敲门砖，内推通过率远高于海投。</li><li>投递时附一句「为什么我合适」+ 作品集链接，而不是只发简历。</li><li>记录每个岗位的状态，形成简单的漏斗管理。</li></ul></details></div></div><div class="aipm-res-label">推荐资源</div><div class="aipm-res-list"><a class="aipm-res" href="#interview" target="_blank" rel="noopener"><span class="aipm-res-type">指南</span><span class="aipm-res-body"><span class="aipm-res-title">AI PM 面试题库</span><span class="aipm-res-sub">高频问题 + 答题框架 + 参考答案</span></span><span class="aipm-res-arrow">↗</span></a><a class="aipm-res" href="https://www.linkedin.com/podcast/the-ai-pm-build-new/extreme789/" target="_blank" rel="noopener"><span class="aipm-res-type">文章</span><span class="aipm-res-body"><span class="aipm-res-title">AI PM 求职指南</span><span class="aipm-res-sub">简历优化 + 面试策略 + 岗位选择</span></span><span class="aipm-res-arrow">↗</span></a></div></div></div><div class="aipm-block"><div class="aipm-block-head"><span class="aipm-block-idx">💬</span><div class="aipm-block-title">高频面试题（8）</div></div><details class="aipm-iv"><summary><span class="aipm-iv-tag">Agent 设计</span><span class="aipm-iv-q">设计一个客服 Agent，它需要能查订单、改地址、处理退款。你会怎么设计 Tool Use 和 Agent Loop？</span></summary><div class="aipm-iv-body"><div class="aipm-iv-row"><b>思路</b> 思路 先画 Agent 架构图（感知→工具选择→执行→观察→循环），再定义每个 Tool 的输入输出 schema，最后设计 fallback 策略（什么时候转人工）。重点讲清楚「多轮对话的状态管理」。</div><div class="aipm-iv-row"><b>参考</b> 架构设计： 用户消息进入后，先过意图识别（小模型/规则），判断属于查询类还是操作类。查询类直接调用对应 Tool 返回结果；操作类需要先确认再执行。 Tool 定义： ① query_order(order_id) → 返回订单状态、金额、商品列表；② update_address(order_id, new_addr) → 需要用户确认后执行；③ process_refund(order_id, reason) → 金额超过阈值需人工审批。 Agent Loop： 感知（接收消息）→ 思考（LLM 判断需要调哪个 Tool）→ 行动（执行 Tool）→ 观察（读取返回结果）→ 循环（如果需要多步则继续）。关键：每步都要记录到 context，避免重复调用。 Fallback 策略： 连续 2 次工具调用失败 → 转人工；退款金额 &gt;500 元 → 人工审批；用户情绪检测到负面 → 转人工并标记优先级。 加分项： 提到用 Checkpointing 保存对话状态，用户中途离开再回来能接续；提到 Eval 框架评估 Agent 在 100 个测试用例上的表现。</div></div></details><details class="aipm-iv"><summary><span class="aipm-iv-tag">Eval 方法</span><span class="aipm-iv-q">你的 AI 客服上线后准确率只有 75%，你会怎么系统性地提升？</span></summary><div class="aipm-iv-body"><div class="aipm-iv-row"><b>思路</b> 思路 分三步：1) 建 Eval 数据集，按错误类型分类（幻觉/拒答/理解错误）；2) 分析 Top 3 错误类型的根因（Prompt/数据/模型）；3) 针对性优化并重新评估。强调「数据驱动的迭代」。</div><div class="aipm-iv-row"><b>参考</b> 第一步：建立 Eval 数据集 从线上日志中抽取 500 条 bad case，按错误类型标注：幻觉（编造不存在的信息）35%、拒答（该回答但不回答）25%、理解错误（答非所问）20%、格式问题 15%、其他 5%。 第二步：根因分析 幻觉 35% → 根因：知识库覆盖不足，模型在知识盲区编造答案。方案：加 RAG，对高频问题补充知识库文档。 拒答 25% → 根因：System Prompt 过于保守，安全策略误伤。方案：调整 Prompt 边界，区分「不能回答」和「不需要回答」。 理解错误 20% → 根因：用户口语化表达，模型没正确理解意图。方案：加 Few-shot 示例覆盖常见口语表达。 第三步：迭代与验证 每次修改后跑 Eval 数据集，对比修改前后准确率。目标：幻觉降到 10% 以下，整体准确率提升到 88%+。上线后持续监控，建立数据飞轮——用户反馈自动进入下一轮 Eval 数据集。 加分项： 提到「不要只看整体准确率」，要分场景看（退款场景准确率可能比查询低 15%）；提到成本控制（不是所有 bad case 都值得修，按影响面排序）。</div></div></details><details class="aipm-iv"><summary><span class="aipm-iv-tag">产品策略</span><span class="aipm-iv-q">RAG 和微调，什么场景选哪个？如果一个客户问「我的产品文档有 10 万页，怎么做 AI 问答」，你怎么回答？</span></summary><div class="aipm-iv-body"><div class="aipm-iv-row"><b>思路</b> 思路 核心判断：知识更新频率。频繁更新→RAG（改数据库不改模型）；稳定领域+特定格式→微调。10 万页文档→RAG + 分块策略 + 向量检索，不建议微调（成本高、更新难）。</div><div class="aipm-iv-row"><b>参考</b> 决策框架： 选 RAG 当：知识需要频繁更新、需要溯源（标注答案来自哪份文档）、数据量大且持续增长、预算有限。 选微调当：需要特定输出风格/格式、领域术语密集且稳定、推理速度要求高（微调后小模型可能够用）、有足够的标注数据。 10 万页文档的具体方案： 1. 分块策略： 按章节/段落分块，每块 500-1000 Token，保留上下文重叠 100 Token。不要按固定字数切——会切断语义。 2. 向量化： 用 Embedding 模型（如 text-embedding-3-small）对每个块生成向量，存入向量数据库（Pinecone / Milvus / Chroma）。 3. 检索策略： 用户提问 → 向量检索 Top 5 相关块 → 拼 Prompt → LLM 生成回答。加 Rerank 提升精度。 4. 为什么不微调： 10 万页 ≈ 1.5 亿 Token，微调成本高且文档更新后需要重新训练。RAG 只需更新数据库。 加分项： 提到混合方案——RAG 为主 + 微调一个小模型做意图分类/路由；提到 Eval（建 100 个标准 Q&amp;A 对，评估检索召回率和回答准确率）；提到成本估算（每千次查询的 Token 成本）。</div></div></details><details class="aipm-iv"><summary><span class="aipm-iv-tag">Agent 设计</span><span class="aipm-iv-q">你的 Agent 延迟太高（平均 15 秒），用户抱怨。你会从哪些维度优化？</span></summary><div class="aipm-iv-body"><div class="aipm-iv-row"><b>思路</b> 思路 四个方向：1) 模型层——换小模型做路由，大模型做核心；2) Prompt 层——减少 Token、缓存 system prompt；3) 架构层——并行工具调用、流式输出；4) 产品层——加 loading 动画、分步展示结果。关键是先测量再优化。</div><div class="aipm-iv-row"><b>参考</b> 模型层： 用更小的模型做路由 / 分类，只在核心步骤调用大模型；开启流式输出（streaming），让用户先看到部分结果而不是干等。 Prompt 层： 压缩 system prompt、减少 few-shot 示例长度、去掉冗余指令；把可并行的子任务拆成独立 prompt 并发调用。 架构层： 工具调用改并行（同时查订单 + 查库存，而非串行）；加结果缓存与语义缓存，相同问题不重复算；预取下一步可能需要的数据；用轻量 planner 减少规划步数。 产品层： 骨架屏 + 渐进式渲染，先出结构再填内容；乐观 UI（先显示「正在处理」）；把长任务拆成可感知的子步骤并展示进度条。 加分项： 给出「延迟预算拆解」——规划 2s / 检索 5s / 生成 8s，定位瓶颈在哪一段；用 trace（如 LangSmith）逐段监控，优先优化最慢的那一段而非整体。</div></div></details><details class="aipm-iv"><summary><span class="aipm-iv-tag">产品策略</span><span class="aipm-iv-q">AI 产品和传统产品最大的区别是什么？用你自己的话解释。</span></summary><div class="aipm-iv-body"><div class="aipm-iv-row"><b>思路</b> 思路 三个核心差异：1) 确定性→概率性（接受非确定性输出）；2) 功能验收→持续 Eval（永不「完成」）；3) 数据是运营工具→数据是产品本身（数据飞轮）。用具体案例说明，不要背概念。</div><div class="aipm-iv-row"><b>参考</b> 确定性 → 概率性： 传统功能给定输入必有确定输出；AI 产品输出有方差，同一问题可能得到不同答案。PM 要接受「不完美但够用」，用置信度 / 兜底策略管理不确定性。 功能验收 → 持续 Eval： 传统产品上线即验收完成；AI 产品上线只是开始，需持续评估质量、监控模型漂移，答案可能随模型升级变好或变差。 数据是产品本身： 传统产品的数据是运营辅助；AI 产品的效果取决于数据飞轮——用户反馈、bad case、标注数据直接决定产品能力，数据闭环即核心竞争力。 加分项： 补充「安全护栏与人在回路」——高风险操作（退款、删除）必须人工确认；可解释性不是技术点缀而是用户信任机制。用「传统 PM 管功能，AI PM 管概率」一句话收尾。</div></div></details><details class="aipm-iv"><summary><span class="aipm-iv-tag">Eval 方法</span><span class="aipm-iv-q">什么是「幻觉」？你的产品里如何检测和降低幻觉？</span></summary><div class="aipm-iv-body"><div class="aipm-iv-row"><b>思路</b> 思路 幻觉 = LLM 生成看似合理但事实错误的内容。检测：自动（事实一致性校验）+ 人工（bad case 标注）。降低：RAG 提供事实依据、Prompt 约束（「不确定时说不知道」）、输出后校验。产品设计上让用户能纠错。</div><div class="aipm-iv-row"><b>参考</b> 定义： 幻觉 = 模型生成看似合理但事实错误、或根本不存在的内容（张冠李戴、编造来源、虚构数据）。 检测： 自动——事实一致性打分、检索对齐度校验、NLI 自然语言推断；人工——抽样评测 + bad case 标注，建立幻觉率基线。 降低： RAG 基于可信知识库生成，让答案有出处；Prompt 约束「不确定时说不知道 / 必须引用来源」；用户纠错闭环——让真人能一键标记错误并回流训练。 加分项： 按场景设分级容忍度（闲聊可宽松、医疗 / 金融要严格）；建幻觉率 dashboard 持续监控，而不是上线一次就完事。</div></div></details><details class="aipm-iv"><summary><span class="aipm-iv-tag">技术协作</span><span class="aipm-iv-q">你的算法工程师说「这个效果做不出来，模型能力不够」。你怎么判断他说的是真的还是推脱？</span></summary><div class="aipm-iv-body"><div class="aipm-iv-row"><b>思路</b> 思路 三步验证：1) 要具体的 Eval 数据（准确率多少？在什么测试集上？）；2) 对比竞品/开源方案（别人做到了吗？）；3) 拆解问题（是模型能力问题还是 Prompt/架构问题？）。AI PM 不需要会写代码，但必须能看懂 Eval 结果。</div><div class="aipm-iv-row"><b>参考</b> 要 Eval 数据： 不让对方用「感觉不行」搪塞，要求量化指标（准确率多少？在什么测试集上？和 baseline 差多少？）。AI PM 不写代码，但必须看得懂评测结果。 对比竞品 / 开源： 业界或竞品做到没？差距在哪？如果别人用类似方案做到了，那「做不出来」往往是范围或数据问题，不是能力问题。 拆解问题： 把「做不出来」拆成子问题（是模型能力、数据质量、还是架构设计？），定位真瓶颈。很多「做不到」其实是「没拆对」。 加分项： 设 1–2 天的 spike 小实验验证可行性，用数据决策而非立场；约定「做不到的判定标准」写入需求文档，避免反复扯皮。</div></div></details><details class="aipm-iv"><summary><span class="aipm-iv-tag">产品策略</span><span class="aipm-iv-q">给你 3 个月和 2 个工程师，做一个 AI 产品 MVP。你会选什么方向？为什么？</span></summary><div class="aipm-iv-body"><div class="aipm-iv-row"><b>思路</b> 思路 考察产品判断力。好的回答：选一个「AI 能做到、传统方案做不到」的场景（而不是用 AI 重复造轮子），有明确的 Eval 标准，MVP 范围克制（1 个核心功能 &gt; 5 个半成品），有商业化路径。避免选太泛的方向。</div><div class="aipm-iv-row"><b>参考</b> 选 AI 独有价值： 挑「AI 能做到、传统方案做不到 / 做不划算」的场景，而不是用 AI 重造一个表单。差异化才是 MVP 的意义。 明确 Eval： 能定义可量化的成功标准（准确率、满意度、节省时长），否则无法判断是否做对了，也无法迭代。 克制范围： MVP 只验证一个核心假设，1 个功能 &gt; 5 个半成品；先跑通主链路再补边角。 商业化： 选有付费意愿、价值清晰场景，而非技术 demo；想清楚谁买单、为什么买单。 加分项： 用「一周出可用雏形 + 数据验证」的节奏替代「一次到位」；先拿真实用户跑通再谈扩展，避免闭门造车三个月做出没人要的东西。</div></div></details></div></div>
+      </section>
+
+      <!-- GitHub -->
+      <section class="section" id="section-github">
+        <div class="section-title">🐙 GitHub AI 热点</div>
+        <div class="section-sub">trending 过滤 AI 相关仓库</div>
+        <div class="card"><ul class="scroll"><li><div class="row"><a href="https://github.com/citrolabs/ego-lite" target="_blank">citrolabs / ego-lite</a><span><span class="badge ok">AI</span> <span class="score">★ 4337</span></span></div><div class="muted">The fastest browser for AI agents to run web automation, built for sharing your logged-in browser state with your AI agents, like Codex or Claude Code, without disturbing you. Zero cost, zero config.</div><div><span class="tag">JavaScript</span> <span class="muted">今日 +898</span></div></li><li><div class="row"><a href="https://github.com/CoreBunch/Instatic" target="_blank">CoreBunch / Instatic</a><span><span class="badge ok">AI</span> <span class="score">★ 5562</span></span></div><div class="muted">The open-source alternative to Webflow, Framer and WordPress. Agentic self-hosted visual CMS outputting clean static pages. Users, roles, plugins, content, database, it's all there.</div><div><span class="tag">TypeScript</span> <span class="muted">今日 +892</span></div></li><li><div class="row"><a href="https://github.com/OtterMind/Chat2DB" target="_blank">OtterMind / Chat2DB</a><span><span class="badge ok">AI</span> <span class="score">★ 27041</span></span></div><div class="muted">🔥🔥🔥 AI-driven database tool and SQL client, The hottest GUI client, supporting MySQL, Oracle, PostgreSQL, DB2, SQL Server, DB2, SQLite, H2, ClickHouse, and more.</div><div><span class="tag">Java</span> <span class="muted">今日 +399</span></div></li><li><div class="row"><a href="https://github.com/pbakaus/impeccable" target="_blank">pbakaus / impeccable</a><span><span class="badge ok">AI</span> <span class="score">★ 50530</span></span></div><div class="muted">The design language that makes your AI harness better at design.</div><div><span class="tag">JavaScript</span> <span class="muted">今日 +466</span></div></li><li><div class="row"><a href="https://github.com/shiyu-coder/Kronos" target="_blank">shiyu-coder / Kronos</a><span><span class="badge ok">AI</span> <span class="score">★ 34102</span></span></div><div class="muted">Kronos: A Foundation Model for the Language of Financial Markets</div><div><span class="tag">Python</span> <span class="muted">今日 +322</span></div></li><li><div class="row"><a href="https://github.com/alibaba/open-code-review" target="_blank">alibaba / open-code-review</a><span><span class="badge ok">AI</span> <span class="score">★ 13672</span></span></div><div class="muted">Open-source &amp; free — Battle-tested at Alibaba's scale. Hybrid architecture code review tool: deterministic pipelines + LLM Agent, precise line-level comments, built-in fine-tuned ruleset (NPE, thread-safety, XSS, SQL injection), OpenAI &amp; Anthropic compatible.</div><div><span class="tag">Go</span> <span class="muted">今日 +840</span></div></li><li><div class="row"><a href="https://github.com/andrewyng/aisuite" target="_blank">andrewyng / aisuite</a><span><span class="badge ok">AI</span> <span class="score">★ 15363</span></span></div><div class="muted">Simple, unified interface to multiple Generative AI providers</div><div><span class="tag">Python</span> <span class="muted">今日 +189</span></div></li><li><div class="row"><a href="https://github.com/anthropics/claude-cookbooks" target="_blank">anthropics / claude-cookbooks</a><span><span class="badge ok">AI</span> <span class="score">★ 50165</span></span></div><div class="muted">A collection of notebooks/recipes showcasing some fun and effective ways of using Claude.</div><div><span class="tag">Jupyter Notebook</span> <span class="muted">今日 +377</span></div></li></ul></div>
+      </section>
+
+      <!-- 行测 -->
+      <section class="section" id="section-xingce">
+        <div class="section-title">📝 行测每日练</div>
+        <div class="section-sub">粉笔「行测小讲堂」按日轮换</div>
+        <div class="card"><div class="pick"><div class="muted">📝 行测每日练 · 进度 13/15</div><div class="t"><a href="https://www.fenbi.com/page/exam-preparation-material-detail/178/454686776521728" target="_blank">强化-判断-定义判断-抓取关键词</a></div><div class="muted" style="margin-top:8px">行测小讲堂 导读 定义判断这类题目在我们事业单位考试中也是比较常见的一种题型，由于文字多、内容杂，很多同学没有阅读的耐心，或者阅读了以后发现整个题干都是所谓的“关键词”，这就导致做题的速度以及正确率大打折扣。 其实在定义判断中，真正有用的关键词只有几个，甚至是某一个最核心的点就能够帮助我们把题目做对。今天我们就来学习一下如何找准定义里的核心关键词。 知识梳理…</div><div class="muted" style="margin-top:6px">点开即读粉笔「行测小讲堂」精讲。</div></div></div>
+      </section>
+
+      <!-- 申论 -->
+      <section class="section" id="section-shenlun">
+        <div class="section-title">📖 申论每日读</div>
+        <div class="section-sub">粉笔「申论小讲堂」按日轮换</div>
+        <div class="card"><div class="pick"><div class="muted">📖 申论每日读 · 进度 8/10</div><div class="t"><a href="https://www.fenbi.com/page/exam-preparation-material-detail/181/443481264252928" target="_blank">攻克申论中的“启示”类问题</a></div><div class="muted" style="margin-top:8px">申论小讲堂 “ 一、初识“启示” 对策是指解决某种问题的策略或方法，是单一题中最常考的要素之一。在申论考试中，对策类作答的要点内容多以动宾短语的形式呈现。对策类题目除了我们最常见的“提出建议、概括措施”类的问法以外，还有一类问法很特殊，就是“启示类”问法，这类题目要求我们能够从其他地区或者其他国家的做法中得到启示，进行方法借鉴。需要注意的是，启示类题目需要我…</div><div class="muted" style="margin-top:6px">点开即读粉笔「申论小讲堂」范文/技巧。</div></div></div>
+      </section>
+
+      <!-- 雅思单词 -->
+      <section class="section" id="section-ielts">
+        <div class="section-title">🇬🇧 雅思单词</div>
+        <div class="section-sub">每日 15 个核心词 · 点击卡片看释义 · 🔊 朗读发音</div>
+        <div class="card"><div class="ielts-bar"><span class="muted">🇬🇧 雅思核心词 · 第 8/10 组 · 共 15 词</span><span class="ielts-progress">累计掌握 <b id="ielts-count">0</b> 词</span></div><div class="ielts-grid"><div class="ielts-card" data-word="magnitude"><div class="ielts-front" onclick="flipIelts(this)"><div class="ielts-wordrow"><span class="ielts-word">magnitude</span><button class="ielts-spk" type="button" onclick="speakIelts(event,'magnitude')" title="朗读发音">🔊</button></div><div class="ielts-phon">/ˈmæɡnɪtjuːd/</div><div class="ielts-hint">点击看释义 ▾</div></div><div class="ielts-back" style="display:none"><div class="ielts-pos">n. 量级；巨大</div><div class="ielts-ex">We underestimated the magnitude of the problem.</div><div class="ielts-exzh">我们低估了问题的量级。</div><button class="ielts-master" type="button" onclick="masterIelts(this,'magnitude')">标记为已掌握</button></div></div><div class="ielts-card" data-word="mediate"><div class="ielts-front" onclick="flipIelts(this)"><div class="ielts-wordrow"><span class="ielts-word">mediate</span><button class="ielts-spk" type="button" onclick="speakIelts(event,'mediate')" title="朗读发音">🔊</button></div><div class="ielts-phon">/ˈmiːdieɪt/</div><div class="ielts-hint">点击看释义 ▾</div></div><div class="ielts-back" style="display:none"><div class="ielts-pos">v. 调解；斡旋</div><div class="ielts-ex">A third party mediated the dispute.</div><div class="ielts-exzh">第三方调解了争端。</div><button class="ielts-master" type="button" onclick="masterIelts(this,'mediate')">标记为已掌握</button></div></div><div class="ielts-card" data-word="notion"><div class="ielts-front" onclick="flipIelts(this)"><div class="ielts-wordrow"><span class="ielts-word">notion</span><button class="ielts-spk" type="button" onclick="speakIelts(event,'notion')" title="朗读发音">🔊</button></div><div class="ielts-phon">/ˈnəʊʃən/</div><div class="ielts-hint">点击看释义 ▾</div></div><div class="ielts-back" style="display:none"><div class="ielts-pos">n. 概念；想法</div><div class="ielts-ex">He has no notion of the risk.</div><div class="ielts-exzh">他对风险毫无概念。</div><button class="ielts-master" type="button" onclick="masterIelts(this,'notion')">标记为已掌握</button></div></div><div class="ielts-card" data-word="phenomenal"><div class="ielts-front" onclick="flipIelts(this)"><div class="ielts-wordrow"><span class="ielts-word">phenomenal</span><button class="ielts-spk" type="button" onclick="speakIelts(event,'phenomenal')" title="朗读发音">🔊</button></div><div class="ielts-phon">/fəˈnɒmɪnl/</div><div class="ielts-hint">点击看释义 ▾</div></div><div class="ielts-back" style="display:none"><div class="ielts-pos">adj. 非凡的；惊人的</div><div class="ielts-ex">The growth was phenomenal last year.</div><div class="ielts-exzh">去年的增长惊人。</div><button class="ielts-master" type="button" onclick="masterIelts(this,'phenomenal')">标记为已掌握</button></div></div><div class="ielts-card" data-word="prerequisite"><div class="ielts-front" onclick="flipIelts(this)"><div class="ielts-wordrow"><span class="ielts-word">prerequisite</span><button class="ielts-spk" type="button" onclick="speakIelts(event,'prerequisite')" title="朗读发音">🔊</button></div><div class="ielts-phon">/ˌpriːˈrekwəzɪt/</div><div class="ielts-hint">点击看释义 ▾</div></div><div class="ielts-back" style="display:none"><div class="ielts-pos">n. 先决条件</div><div class="ielts-ex">A degree is a prerequisite for the role.</div><div class="ielts-exzh">学位是该职位的先决条件。</div><button class="ielts-master" type="button" onclick="masterIelts(this,'prerequisite')">标记为已掌握</button></div></div><div class="ielts-card" data-word="radical"><div class="ielts-front" onclick="flipIelts(this)"><div class="ielts-wordrow"><span class="ielts-word">radical</span><button class="ielts-spk" type="button" onclick="speakIelts(event,'radical')" title="朗读发音">🔊</button></div><div class="ielts-phon">/ˈrædɪkl/</div><div class="ielts-hint">点击看释义 ▾</div></div><div class="ielts-back" style="display:none"><div class="ielts-pos">adj. 根本的；激进的</div><div class="ielts-ex">The reform calls for radical change.</div><div class="ielts-exzh">改革要求根本性改变。</div><button class="ielts-master" type="button" onclick="masterIelts(this,'radical')">标记为已掌握</button></div></div><div class="ielts-card" data-word="relatively"><div class="ielts-front" onclick="flipIelts(this)"><div class="ielts-wordrow"><span class="ielts-word">relatively</span><button class="ielts-spk" type="button" onclick="speakIelts(event,'relatively')" title="朗读发音">🔊</button></div><div class="ielts-phon">/ˈrelətɪvli/</div><div class="ielts-hint">点击看释义 ▾</div></div><div class="ielts-back" style="display:none"><div class="ielts-pos">adv. 相对地</div><div class="ielts-ex">The task is relatively simple.</div><div class="ielts-exzh">这项任务相对简单。</div><button class="ielts-master" type="button" onclick="masterIelts(this,'relatively')">标记为已掌握</button></div></div><div class="ielts-card" data-word="simultaneously"><div class="ielts-front" onclick="flipIelts(this)"><div class="ielts-wordrow"><span class="ielts-word">simultaneously</span><button class="ielts-spk" type="button" onclick="speakIelts(event,'simultaneously')" title="朗读发音">🔊</button></div><div class="ielts-phon">/ˌsɪmlˈteɪniəsli/</div><div class="ielts-hint">点击看释义 ▾</div></div><div class="ielts-back" style="display:none"><div class="ielts-pos">adv. 同时地</div><div class="ielts-ex">The events occurred simultaneously.</div><div class="ielts-exzh">这些事件同时发生。</div><button class="ielts-master" type="button" onclick="masterIelts(this,'simultaneously')">标记为已掌握</button></div></div><div class="ielts-card" data-word="stability"><div class="ielts-front" onclick="flipIelts(this)"><div class="ielts-wordrow"><span class="ielts-word">stability</span><button class="ielts-spk" type="button" onclick="speakIelts(event,'stability')" title="朗读发音">🔊</button></div><div class="ielts-phon">/stəˈbɪləti/</div><div class="ielts-hint">点击看释义 ▾</div></div><div class="ielts-back" style="display:none"><div class="ielts-pos">n. 稳定性</div><div class="ielts-ex">Price stability benefits consumers.</div><div class="ielts-exzh">价格稳定有利于消费者。</div><button class="ielts-master" type="button" onclick="masterIelts(this,'stability')">标记为已掌握</button></div></div><div class="ielts-card" data-word="theoretically"><div class="ielts-front" onclick="flipIelts(this)"><div class="ielts-wordrow"><span class="ielts-word">theoretically</span><button class="ielts-spk" type="button" onclick="speakIelts(event,'theoretically')" title="朗读发音">🔊</button></div><div class="ielts-phon">/ˌθɪəˈretɪkli/</div><div class="ielts-hint">点击看释义 ▾</div></div><div class="ielts-back" style="display:none"><div class="ielts-pos">adv. 理论上</div><div class="ielts-ex">Theoretically, it should work.</div><div class="ielts-exzh">理论上它应该可行。</div><button class="ielts-master" type="button" onclick="masterIelts(this,'theoretically')">标记为已掌握</button></div></div><div class="ielts-card" data-word="whereas"><div class="ielts-front" onclick="flipIelts(this)"><div class="ielts-wordrow"><span class="ielts-word">whereas</span><button class="ielts-spk" type="button" onclick="speakIelts(event,'whereas')" title="朗读发音">🔊</button></div><div class="ielts-phon">/ˈweəræz/</div><div class="ielts-hint">点击看释义 ▾</div></div><div class="ielts-back" style="display:none"><div class="ielts-pos">conj. 然而；鉴于</div><div class="ielts-ex">He is rich whereas his brother is poor.</div><div class="ielts-exzh">他很富有，而他弟弟很穷。</div><button class="ielts-master" type="button" onclick="masterIelts(this,'whereas')">标记为已掌握</button></div></div><div class="ielts-card" data-word="abundant"><div class="ielts-front" onclick="flipIelts(this)"><div class="ielts-wordrow"><span class="ielts-word">abundant</span><button class="ielts-spk" type="button" onclick="speakIelts(event,'abundant')" title="朗读发音">🔊</button></div><div class="ielts-phon">/əˈbʌndənt/</div><div class="ielts-hint">点击看释义 ▾</div></div><div class="ielts-back" style="display:none"><div class="ielts-pos">adj. 丰富的；充裕的</div><div class="ielts-ex">The region has abundant natural resources.</div><div class="ielts-exzh">该地区自然资源丰富。</div><button class="ielts-master" type="button" onclick="masterIelts(this,'abundant')">标记为已掌握</button></div></div><div class="ielts-card" data-word="coherent"><div class="ielts-front" onclick="flipIelts(this)"><div class="ielts-wordrow"><span class="ielts-word">coherent</span><button class="ielts-spk" type="button" onclick="speakIelts(event,'coherent')" title="朗读发音">🔊</button></div><div class="ielts-phon">/kəʊˈhɪərənt/</div><div class="ielts-hint">点击看释义 ▾</div></div><div class="ielts-back" style="display:none"><div class="ielts-pos">adj. 连贯的；有条理的</div><div class="ielts-ex">She gave a coherent account of the event.</div><div class="ielts-exzh">她对事件作了连贯的描述。</div><button class="ielts-master" type="button" onclick="masterIelts(this,'coherent')">标记为已掌握</button></div></div><div class="ielts-card" data-word="compelling"><div class="ielts-front" onclick="flipIelts(this)"><div class="ielts-wordrow"><span class="ielts-word">compelling</span><button class="ielts-spk" type="button" onclick="speakIelts(event,'compelling')" title="朗读发音">🔊</button></div><div class="ielts-phon">/kəmˈpelɪŋ/</div><div class="ielts-hint">点击看释义 ▾</div></div><div class="ielts-back" style="display:none"><div class="ielts-pos">adj. 引人注目的；令人信服的</div><div class="ielts-ex">The evidence is compelling.</div><div class="ielts-exzh">证据令人信服。</div><button class="ielts-master" type="button" onclick="masterIelts(this,'compelling')">标记为已掌握</button></div></div><div class="ielts-card" data-word="concrete"><div class="ielts-front" onclick="flipIelts(this)"><div class="ielts-wordrow"><span class="ielts-word">concrete</span><button class="ielts-spk" type="button" onclick="speakIelts(event,'concrete')" title="朗读发音">🔊</button></div><div class="ielts-phon">/ˈkɒŋkriːt/</div><div class="ielts-hint">点击看释义 ▾</div></div><div class="ielts-back" style="display:none"><div class="ielts-pos">adj. 具体的；实在的</div><div class="ielts-ex">We need concrete examples, not vague ideas.</div><div class="ielts-exzh">我们需要具体例子，而非模糊想法。</div><button class="ielts-master" type="button" onclick="masterIelts(this,'concrete')">标记为已掌握</button></div></div></div></div>
+      </section>
+
+      <footer>数据来源：aihot.virxact.com · 天天基金(东方财富) · 东方财富公告 · GitHub Trending ·
+AIPM 学习路径(xiaokaishuibuxing/aipm-learning-path) · 粉笔网(行测/申论小讲堂) ｜ 本页由本地脚本每日生成，仅供学习参考，不构成投资建议。</footer>
+    </div>
+  </main>
+</div>
+<script>
+const dateKey = "wb_done_2026-07-26_";
+const modules = {
+  aihot: "AI 日报",
+  fund: "基金涨幅榜",
+  fundnews: "基金资讯",
+  financial: "财报 & 招股书",
+  aipm: "AIPM 学习",
+  github: "GitHub AI 热点",
+  xingce: "行测每日练",
+  shenlun: "申论每日读",
+  ielts: "雅思单词"
+};
+function switchTab(el, key){
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('section-'+key).classList.add('active');
+  if(window.innerWidth <= 860) toggleMenu(false);
+}
+function jumpTo(key){
+  const nav = document.querySelector('.nav-item[data-target="'+key+'"]');
+  if(nav) switchTab(nav, key);
+}
+function toggleCheck(key){
+  const done = localStorage.getItem(dateKey+key) === '1';
+  localStorage.setItem(dateKey+key, done ? '' : '1');
+  renderChecks();
+}
+function initAipmChecks(){
+  const dk = "wb_aipm_2026-07-26";
+  document.querySelectorAll('.aipm-task input[type=checkbox]').forEach(function(cb){
+    const k = cb.getAttribute('data-key');
+    const store = dk + '_' + k;
+    cb.checked = localStorage.getItem(store) === '1';
+    cb.addEventListener('change', function(){
+      localStorage.setItem(store, cb.checked ? '1' : '');
+    });
+  });
+}
+function flipIelts(front){
+  const card = front.closest('.ielts-card');
+  const back = card.querySelector('.ielts-back');
+  const hint = front.querySelector('.ielts-hint');
+  const open = back.style.display === 'none';
+  back.style.display = open ? 'block' : 'none';
+  if(hint) hint.textContent = open ? '点击收起 ▴' : '点击看释义 ▾';
+}
+function speakIelts(ev, word){
+  ev.stopPropagation();
+  try{
+    const u = new SpeechSynthesisUtterance(word);
+    u.lang = 'en-GB'; u.rate = 0.9;
+    speechSynthesis.cancel(); speechSynthesis.speak(u);
+  }catch(e){}
+}
+function masterIelts(btn, word){
+  let set = {};
+  try{ set = JSON.parse(localStorage.getItem('wb_ielts_mastered') || '{}'); }catch(e){}
+  if(set[word]){ delete set[word]; btn.classList.remove('done'); btn.textContent = '标记为已掌握'; }
+  else{ set[word] = 1; btn.classList.add('done'); btn.textContent = '已掌握 ✓'; }
+  try{ localStorage.setItem('wb_ielts_mastered', JSON.stringify(set)); }catch(e){}
+  updateIeltsCount();
+}
+function updateIeltsCount(){
+  let set = {};
+  try{ set = JSON.parse(localStorage.getItem('wb_ielts_mastered') || '{}'); }catch(e){}
+  const c = document.getElementById('ielts-count');
+  if(c) c.textContent = Object.keys(set).length;
+  document.querySelectorAll('.ielts-card').forEach(function(card){
+    const w = card.getAttribute('data-word');
+    const b = card.querySelector('.ielts-master');
+    if(set[w]){ b.classList.add('done'); b.textContent = '已掌握 ✓'; }
+  });
+}
+function initIelts(){ updateIeltsCount(); }
+function renderChecks(){
+  let doneCount = 0;
+  Object.keys(modules).forEach(k=>{
+    const el = document.getElementById('check-'+k);
+    const st = document.getElementById('plan-status-'+k);
+    const isDone = localStorage.getItem(dateKey+k) === '1';
+    if(isDone){ el.classList.add('done'); el.innerHTML='✓'; st.textContent='已完成'; doneCount++; }
+    else{ el.classList.remove('done'); el.innerHTML=''; st.textContent='待完成'; }
+  });
+  const total = Object.keys(modules).length;
+  document.getElementById('progress-badge').textContent = doneCount+'/'+total;
+  document.getElementById('progress-fill').style.width = (doneCount/total*100)+'%';
+  const texts = ['完成 0 项，开始今日计划吧 💪','完成 1 项， momentum 有了 ⚡','完成 '+doneCount+' 项，继续加油 👇','完成 '+doneCount+' 项，过半啦 🚀','完成 '+doneCount+' 项，冲刺最后几项 🏁','全部完成！今日计划清空 ✨'];
+  let ti = doneCount === 0 ? 0 : doneCount === total ? 5 : doneCount >= total*0.75 ? 4 : doneCount >= total*0.5 ? 3 : doneCount >= 2 ? 2 : 1;
+  document.getElementById('progress-text').textContent = texts[ti];
+}
+function toggleMenu(force){
+  const sb = document.getElementById('sidebar');
+  const ov = document.getElementById('overlay');
+  const open = force===undefined ? !sb.classList.contains('open') : force;
+  sb.classList.toggle('open', open);
+  ov.classList.toggle('open', open);
+}
+function showSync(){
+  alert('iCloud 同步路径：~/Library/Mobile Documents/com~apple~CloudDocs/Workbench/dashboard.html  （iPhone 文件App → iCloud Drive → Workbench 用 Safari 打开）');
+}
+function doRefresh(){
+  if(location.protocol === 'http:' || location.protocol === 'https:'){
+    const btn = event && event.target;
+    if(btn){ btn.textContent='⏳ 抓取中…'; btn.disabled=true; }
+    fetch('/refresh').then(function(r){ return r.text(); }).then(function(){
+      location.href = '/?t=' + Date.now();
+    }).catch(function(){
+      alert('实时刷新服务未启动。请先运行 server.py，或此份为 iCloud 静态副本（直接双击本地 dashboard.html 也可）。');
+      if(btn){ btn.textContent='↻ 刷新'; btn.disabled=false; }
+    });
+  } else {
+    location.reload();
+  }
+}
+/* 我的任务 CRUD (localStorage 按日持久化) */
+const todoKey = "wb_todo_2026-07-26";
+const memoKey = "wb_memo_2026-07-26";
+function loadTodos(){
+  try { return JSON.parse(localStorage.getItem(todoKey)) || []; } catch(e) { return []; }
+}
+function saveTodos(list){
+  localStorage.setItem(todoKey, JSON.stringify(list));
+  renderTodos();
+}
+function addTodo(){
+  const inp = document.getElementById('todo-input');
+  const text = inp.value.trim();
+  if(!text) return;
+  const list = loadTodos();
+  list.push({id: Date.now(), text: text, done: false});
+  inp.value = '';
+  saveTodos(list);
+}
+function toggleTodo(id){
+  const list = loadTodos().map(function(t){ if(t.id===id) t.done=!t.done; return t; });
+  saveTodos(list);
+}
+function delTodo(id){
+  saveTodos(loadTodos().filter(function(t){ return t.id!==id; }));
+}
+function renderTodos(){
+  const list = loadTodos();
+  const ul = document.getElementById('todo-list');
+  if(!ul) return;
+  ul.innerHTML = '';
+  list.forEach(function(t){
+    const li = document.createElement('li');
+    li.className = 'todo-item';
+    const box = document.createElement('div');
+    box.className = 'todo-box' + (t.done ? ' done' : '');
+    box.textContent = t.done ? '✓' : '';
+    box.onclick = function(){ toggleTodo(t.id); };
+    const span = document.createElement('span');
+    span.className = 'todo-text' + (t.done ? ' done' : '');
+    span.textContent = t.text;
+    const del = document.createElement('span');
+    del.className = 'todo-del';
+    del.textContent = '✕';
+    del.title = '删除';
+    del.onclick = function(){ delTodo(t.id); };
+    li.appendChild(box); li.appendChild(span); li.appendChild(del);
+    ul.appendChild(li);
+  });
+  if(list.length === 0){
+    ul.innerHTML = '<li class="muted" style="border:none;padding:6px 0">还没有任务，上面加一条吧。</li>';
+  }
+}
+function loadMemo(){
+  const ta = document.getElementById('memo-input');
+  if(ta) ta.value = localStorage.getItem(memoKey) || '';
+}
+function saveMemo(){
+  const ta = document.getElementById('memo-input');
+  if(ta) localStorage.setItem(memoKey, ta.value);
+}
+renderChecks();
+initAipmChecks();
+initIelts();
+renderTodos();
+loadMemo();
+</script>
+</body>
+</html>
