@@ -585,13 +585,15 @@ def sync_icloud(out_path):
 
 # ---------------- HTML 生成 ----------------
 CSS = """
-:root{--bg:#f5f6f8;--card:#ffffff;--ink:#1f2430;--sub:#6b7280;--line:#e6e8ec;
---accent:#3b6ef5;--green:#1f9d55;--red:#d8442f;--chip:#eef2ff;--shadow:0 1px 3px rgba(0,0,0,.06);
---sidebar-active:#6b8c42;--sidebar-active-text:#ffffff;--sidebar-hover:#f3f5ef}
+:root{--bg:#fff2f8;--card:#ffffff;--ink:#3a2b33;--sub:#9a7f8c;--line:#f6e1ec;
+--accent:#e85a9b;--green:#1f9d55;--red:#d8442f;--chip:#ffe9f3;--shadow:0 1px 3px rgba(214,120,170,.10);
+--sidebar-active:#ec6aa6;--sidebar-active-text:#ffffff;--sidebar-hover:#fdeef5;
+--page-bg:radial-gradient(120% 120% at 15% 8%, #fff7fb 0%, transparent 46%), linear-gradient(135deg,#ffe6f2 0%,#ffd3e8 45%,#f1d9ff 100%)}
 [data-theme=dark]{--bg:#16181d;--card:#1f232b;--ink:#e6e8ec;--sub:#9aa3b2;--line:#2c313a;
 --accent:#5b8bff;--green:#34d27b;--red:#ff6b54;--chip:#232a36;--shadow:0 1px 3px rgba(0,0,0,.4);
---sidebar-active:#8cae62;--sidebar-active-text:#11151a;--sidebar-hover:#252b33}
-*{box-sizing:border-box}html,body{margin:0;height:100%;overflow:hidden;background:var(--bg);color:var(--ink);
+--sidebar-active:#8cae62;--sidebar-active-text:#11151a;--sidebar-hover:#252b33;
+--page-bg:linear-gradient(135deg,#1b1e25,#14161b)}
+*{box-sizing:border-box}html,body{margin:0;height:100%;overflow:hidden;background:var(--page-bg,var(--bg));background-attachment:fixed;color:var(--ink);
 font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;
 font-size:15px;line-height:1.55}
 .app{display:flex;height:100vh;width:100vw}
