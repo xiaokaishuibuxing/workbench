@@ -21,14 +21,16 @@
 """
 import argparse
 import base64
+import hashlib
 import json
 import os
 import re
 import sys
+import time
 import traceback
 import warnings
 from datetime import datetime, timedelta
-from urllib.parse import quote
+from urllib.parse import quote, urlencode
 
 import requests
 from bs4 import BeautifulSoup
@@ -568,6 +570,74 @@ def fetch_ielts(base_date):
         return {"words": []}
 
 
+# ---------------- 10. 创意灵感 (抖音/小红书/B站 · AI工作台) ----------------
+# 说明：抖音、小红书均需登录才能看内容，服务端无法稳定抓取，故提供"一键去平台看最新"
+# 的深链；同时用 B站开放搜索接口(WBI 签名)真实抓取最新 AI工作台 视频，作为可看的内容流。
+def _bili_wbi_sign(params):
+    """B站搜索需 WBI 签名，返回带 w_rid/wts 的 params"""
+    try:
+        nav = S.get("https://api.bilibili.com/x/web-interface/nav", timeout=12).json()
+        img = nav["data"]["wbi_img"]["img_url"].rsplit("/", 1)[1].split(".", 1)[0]
+        sub = nav["data"]["wbi_img"]["sub_url"].rsplit("/", 1)[1].split(".", 1)[0]
+    except Exception:
+        return params
+    orig = img + sub
+    enc = [46, 47, 18, 2, 53, 8, 23, 32, 15, 50, 10, 31, 58, 3, 45, 35, 27, 43, 5, 49,
+           33, 9, 42, 19, 29, 28, 14, 39, 12, 38, 41, 13, 37, 48, 7, 16, 24, 55, 40,
+           61, 26, 17, 0, 1, 60, 51, 30, 4, 22, 25, 54, 21, 56, 59, 6, 63, 57, 62,
+           11, 36, 20, 34, 44, 52]
+    mixin = "".join(orig[i] for i in enc)[:32]
+    params["wts"] = int(time.time())
+    q = urlencode(sorted(params.items()))
+    q = re.sub(r"[!']()*]", "", q)
+    params["w_rid"] = hashlib.md5((q + mixin).encode()).hexdigest()
+    return params
+
+
+def fetch_inspiration():
+    kw = "AI工作台 创意"
+    douyin_url = "https://www.douyin.com/search/" + quote(kw)
+    xhs_url = "https://www.xiaohongshu.com/search_result?keyword=" + quote(kw)
+    bili_url = "https://search.bilibili.com/all?keyword=" + quote(kw)
+    videos, note = [], ""
+    try:
+        params = {"keyword": kw, "search_type": "video", "order": "pubdate", "page": 1}
+        params = _bili_wbi_sign(params)
+        url = "https://api.bilibili.com/x/web-interface/wbi/search/type?" + urlencode(params)
+        r = S.get(url, headers={"Referer": "https://search.bilibili.com/"}, timeout=15)
+        data = r.json()
+        res = (data.get("data") or {}).get("result") or []
+        for v in res[:8]:
+            if not isinstance(v, dict):
+                continue
+            bvid = v.get("bvid") or v.get("id") or ""
+            author = ""
+            a = v.get("author")
+            if isinstance(a, dict):
+                author = a.get("name", "")
+            elif isinstance(a, str):
+                author = a
+            d = v.get("duration")
+            dur = f"{int(d)//60}:{int(d)%60:02d}" if isinstance(d, (int, float)) and d > 0 else ""
+            pd = v.get("pubdate")
+            date_s = datetime.fromtimestamp(pd).strftime("%m-%d") if isinstance(pd, (int, float)) and pd > 0 else ""
+            videos.append({
+                "title": re.sub(r"<[^>]+>", "", v.get("title", "")),
+                "url": "https://www.bilibili.com/video/" + (bvid if isinstance(bvid, str) else ""),
+                "author": author,
+                "views": v.get("play", 0),
+                "duration": dur,
+                "date": date_s,
+                "cover": v.get("pic", ""),
+            })
+        note = f"B站实测抓到 {len(videos)} 条最新视频（按发布时间排序）" if videos else "B站暂未返回结果"
+    except Exception as e:
+        note = f"B站抓取失败：{e}（抖音/小红书点击上方按钮即可看最新）"
+    set_status("创意灵感", True, f"抖音/小红书深链 + B站{len(videos)}条")
+    return {"douyin_url": douyin_url, "xhs_url": xhs_url, "bili_url": bili_url,
+            "videos": videos, "note": note}
+
+
 # ---------------- iCloud 同步 (iOS 文件 App 查看) ----------------
 def sync_icloud(out_path):
     try:
@@ -766,6 +836,24 @@ border-radius:10px;padding:5px 9px;white-space:nowrap;flex-shrink:0}
 .aipm-note-pts{margin:0;padding-left:18px}
 .aipm-note-pts li{font-size:13px;color:var(--fg);line-height:1.7;margin:2px 0}
 .aipm-res-label{font-size:12px;font-weight:600;color:var(--sub);margin:12px 0 6px}
+
+/* ---- 创意灵感 ---- */
+.insp-tip{font-size:13px;line-height:1.6;margin-bottom:12px}
+.insp-links{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:10px}
+.insp-btn{display:inline-flex;align-items:center;gap:6px;padding:9px 14px;border-radius:12px;font-size:14px;font-weight:600;text-decoration:none;color:#fff;border:1px solid transparent;transition:.15s}
+.insp-btn:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+.insp-douyin{background:linear-gradient(135deg,#fe2c55,#ff6a8b)}
+.insp-xhs{background:linear-gradient(135deg,#ff2442,#ff7a59)}
+.insp-bili{background:linear-gradient(135deg,#00a1d6,#23c9e8);color:#fff}
+.insp-note{font-size:13px;margin-bottom:12px}
+.insp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+.insp-card{display:flex;flex-direction:column;background:var(--chip);border:1px solid var(--line);border-radius:14px;overflow:hidden;text-decoration:none;color:var(--ink);transition:.15s}
+.insp-card:hover{box-shadow:var(--shadow);transform:translateY(-2px)}
+.insp-cover{width:100%;height:135px;object-fit:cover;background:var(--bg);display:block}
+.insp-card-body{padding:10px 12px}
+.insp-card-title{font-size:14px;font-weight:600;line-height:1.45;margin-bottom:6px;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.insp-card-meta{font-size:12px;color:var(--sub)}
 .aipm-res-list{display:grid;gap:8px}
 .aipm-res{display:flex;align-items:center;gap:10px;background:var(--bg);border:1px solid var(--line);border-radius:12px;
 padding:10px 12px;text-decoration:none;color:var(--ink);transition:transform .1s,box-shadow .15s}
@@ -791,7 +879,7 @@ def esc(s):
     return (str(s).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;"))
 
 
-def build_html(date_str, aihot, fund, fundnews, financial, aipm, github, xingce, shenlun, ielts):
+def build_html(date_str, aihot, fund, fundnews, financial, aipm, github, xingce, shenlun, ielts, inspiration):
     # 模块元信息 (icon, title, subtitle, key)
     modules = [
         ("🗓️", "每日计划", "完成一项打勾，进度一目了然", "dailyplan"),
@@ -804,6 +892,7 @@ def build_html(date_str, aihot, fund, fundnews, financial, aipm, github, xingce,
         ("📝", "行测每日练", "粉笔小讲堂", "xingce"),
         ("📖", "申论每日读", "粉笔小讲堂", "shenlun"),
         ("🇬🇧", "雅思单词", "每日15词", "ielts"),
+        ("💡", "创意灵感", "抖音/小红书 AI工作台", "inspiration"),
     ]
 
     # ---- AI 日报 ----
@@ -996,6 +1085,51 @@ def build_html(date_str, aihot, fund, fundnews, financial, aipm, github, xingce,
         ok, msg = STATUS.get(key, (False, ""))
         return f"{'✅' if ok else '⚠️'} {msg}" if msg else ("✅ 已加载" if ok else "⚠️ 未加载")
 
+    # ---- 创意灵感 ----
+    insp = inspiration or {}
+    douyin_url = esc(insp.get("douyin_url", ""))
+    xhs_url = esc(insp.get("xhs_url", ""))
+    bili_url = esc(insp.get("bili_url", ""))
+    videos = insp.get("videos", []) or []
+    insp_note = esc(insp.get("note", ""))
+    links = (
+        f'<a class="insp-btn insp-douyin" href="{douyin_url}" target="_blank" rel="noopener">🎵 抖音 · 最新 AI工作台创意</a>'
+        f'<a class="insp-btn insp-xhs" href="{xhs_url}" target="_blank" rel="noopener">📕 小红书 · 最新 AI工作台创意</a>'
+        f'<a class="insp-btn insp-bili" href="{bili_url}" target="_blank" rel="noopener">📺 B站 · AI工作台创意</a>'
+    )
+    cards = ""
+    for v in videos:
+        cover = esc(v.get("cover", ""))
+        cover_html = (f'<img class="insp-cover" src="{cover}" loading="lazy" '
+                      f'onerror="this.style.display=\'none\'">' if cover else "")
+        views = v.get("views") or 0
+        views_s = f"{views:,}" if isinstance(views, (int, float)) else str(views)
+        meta_bits = []
+        if v.get("author"):
+            meta_bits.append(esc(str(v["author"])))
+        if views_s and views_s != "0":
+            meta_bits.append("▶ " + views_s)
+        if v.get("duration"):
+            meta_bits.append("⏱ " + esc(str(v["duration"])))
+        if v.get("date"):
+            meta_bits.append("📅 " + esc(str(v["date"])))
+        cards += (
+            f'<a class="insp-card" href="{esc(v.get("url", ""))}" target="_blank" rel="noopener">'
+            f'{cover_html}'
+            f'<div class="insp-card-body">'
+            f'<div class="insp-card-title">{esc(v.get("title", ""))}</div>'
+            f'<div class="insp-card-meta">{" · ".join(meta_bits)}</div>'
+            f'</div></a>'
+        )
+    if not cards:
+        cards = '<div class="muted">B站实时抓取暂未返回（抖音/小红书点击上方按钮即可看最新创意）。</div>'
+    inspiration_html = (
+        f'<div class="insp-tip muted">抖音/小红书需登录后查看，点按钮直达平台最新搜索结果；下方为 B站真实可看的最新视频流。</div>'
+        f'<div class="insp-links">{links}</div>'
+        f'<div class="insp-note muted">{insp_note}</div>'
+        f'<div class="insp-grid">{cards}</div>'
+    )
+
     # ---- 侧边栏导航 HTML ----
     nav_html = ""
     for icon, title, sub, key in modules:
@@ -1154,8 +1288,15 @@ def build_html(date_str, aihot, fund, fundnews, financial, aipm, github, xingce,
         <div class="card">{ielts_html}</div>
       </section>
 
+      <!-- 创意灵感 -->
+      <section class="section" id="section-inspiration">
+        <div class="section-title">💡 创意灵感</div>
+        <div class="section-sub">抖音 / 小红书 / B站 · 最新 AI工作台创意视频</div>
+        <div class="card">{inspiration_html}</div>
+      </section>
+
       <footer>数据来源：aihot.virxact.com · 天天基金(东方财富) · 东方财富公告 · GitHub Trending ·
-AIPM 学习路径(xiaokaishuibuxing/aipm-learning-path) · 粉笔网(行测/申论小讲堂) ｜ 本页由本地脚本每日生成，仅供学习参考，不构成投资建议。</footer>
+AIPM 学习路径(xiaokaishuibuxing/aipm-learning-path) · 粉笔网(行测/申论小讲堂) · 抖音/小红书(深链) · B站(实时抓取) ｜ 本页由本地脚本每日生成，仅供学习参考，不构成投资建议。</footer>
     </div>
   </main>
 </div>
@@ -1170,7 +1311,8 @@ const modules = {{
   github: "GitHub AI 热点",
   xingce: "行测每日练",
   shenlun: "申论每日读",
-  ielts: "雅思单词"
+  ielts: "雅思单词",
+  inspiration: "创意灵感"
 }};
 function switchTab(el, key){{
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
@@ -1375,8 +1517,9 @@ def main():
     xingce = fetch_xingce(base_date)
     shenlun = fetch_shenlun(base_date)
     ielts = fetch_ielts(base_date)
+    inspiration = fetch_inspiration()
 
-    html = build_html(date_str, aihot, fund, fundnews, financial, aipm, github, xingce, shenlun, ielts)
+    html = build_html(date_str, aihot, fund, fundnews, financial, aipm, github, xingce, shenlun, ielts, inspiration)
 
     out_path = os.path.join(OUT_DIR, "dashboard.html")
     with open(out_path, "w", encoding="utf-8") as f:
