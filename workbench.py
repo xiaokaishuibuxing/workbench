@@ -627,7 +627,7 @@ def sync_icloud(out_path):
 
 # ---------------- HTML 生成 ----------------
 CSS = """
-:root{--bg:oklch(98% 0.012 350);--card:#ffffff;--ink:oklch(33% 0.035 350);--sub:oklch(55% 0.022 350);--line:oklch(94% 0.018 350);
+:root{--daer-img:url(__DAER_DATA__);--bg:oklch(98% 0.012 350);--card:#ffffff;--ink:oklch(33% 0.035 350);--sub:oklch(55% 0.022 350);--line:oklch(94% 0.018 350);
 --accent:oklch(62% 0.17 350);--green:#1f9d55;--red:#d8442f;--chip:oklch(96.5% 0.024 350);
 --shadow:0 1px 2px rgba(220,90,155,.06),0 10px 30px -16px rgba(220,90,155,.22);
 --sidebar-active:oklch(64% 0.16 350);--sidebar-active-text:#ffffff;--sidebar-hover:oklch(96% 0.03 350);
@@ -641,6 +641,7 @@ CSS = """
 --sidebar-active:oklch(70% 0.14 350);--sidebar-active-text:#16101a;--sidebar-hover:oklch(30% 0.015 350);
 --page-bg:linear-gradient(135deg,oklch(19% 0.012 350),oklch(15% 0.01 350))}
 *{box-sizing:border-box}html,body{margin:0;height:100%;overflow:hidden;background:var(--page-bg,var(--bg));background-attachment:fixed;color:var(--ink);
+body::before{content:"";position:fixed;right:18px;bottom:12px;width:340px;height:340px;background:url(__DAER_DATA__) center/contain no-repeat;opacity:.92;pointer-events:none;z-index:5;filter:drop-shadow(0 8px 22px rgba(150,90,140,.22))}
 font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;
 font-size:15px;line-height:1.58;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;font-kerning:normal}
 .app{display:flex;height:100vh;width:100vw}
@@ -940,6 +941,13 @@ def esc(s):
 
 
 def build_html(date_str, aihot, fund, fundnews, financial, aipm, github, xingce, shenlun, ielts, gongkao):
+    # 注入白色大耳帽兜官方精灵图为背景层 (透明 PNG, base64 内嵌, 保持单文件)
+    daer_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'assets', 'daermaodou.png')
+    daer_b64 = ''
+    if os.path.exists(daer_path):
+        with open(daer_path, 'rb') as _f:
+            daer_b64 = 'data:image/png;base64,' + base64.b64encode(_f.read()).decode()
+    css = CSS.replace('__DAER_DATA__', daer_b64)
     # 模块元信息 (icon, title, subtitle, key)
     modules = [
         ("🗓️", "每日计划", "完成一项打勾，进度一目了然", "dailyplan"),
@@ -1181,7 +1189,7 @@ def build_html(date_str, aihot, fund, fundnews, financial, aipm, github, xingce,
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>每日工作台 · {esc(date_str)}</title>
-<style>{CSS}</style>
+<style>{css}</style>
 </head>
 <body>
 <div class="app">
