@@ -641,10 +641,10 @@ CSS = """
 --sidebar-active:oklch(70% 0.14 350);--sidebar-active-text:#16101a;--sidebar-hover:oklch(30% 0.015 350);
 --page-bg:linear-gradient(135deg,oklch(19% 0.012 350),oklch(15% 0.01 350))}
 *{box-sizing:border-box}html,body{margin:0;height:100%;overflow:hidden;background:var(--page-bg,var(--bg));background-attachment:fixed;color:var(--ink);
-body::before{content:"";position:fixed;right:18px;bottom:12px;width:340px;height:340px;background:url(__DAER_DATA__) center/contain no-repeat;opacity:.92;pointer-events:none;z-index:5;filter:drop-shadow(0 8px 22px rgba(150,90,140,.22))}
+body::before{content:"";position:fixed;right:-24px;bottom:-36px;width:560px;height:560px;background:url(__DAER_DATA__) center/contain no-repeat;opacity:.5;pointer-events:none;z-index:0;filter:drop-shadow(0 8px 22px rgba(150,90,140,.18));transition:opacity .3s var(--ease-out-quart)}
 font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;
 font-size:15px;line-height:1.58;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;font-kerning:normal}
-.app{display:flex;height:100vh;width:100vw}
+.app{display:flex;height:100vh;width:100vw;position:relative;z-index:1}
 /* sidebar */
 .sidebar{width:260px;flex-shrink:0;background:var(--card);border-right:1px solid var(--line);
 display:flex;flex-direction:column;padding:22px 12px 16px;transition:transform .25s ease}
