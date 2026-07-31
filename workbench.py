@@ -548,6 +548,46 @@ def fetch_shenlun(base_date):
     return _fenbi_pick(FENBI_SHENLUN_LIST, "181", "申论", base_date)
 
 
+# ---------------- 公考工作台 (本地追踪，localStorage 驱动) ----------------
+def fetch_gongkao(base_date):
+    """公考工作台：考试倒计时、习惯数据、每日计划、自测题。纯前端驱动，Python 仅传默认配置。"""
+    try:
+        # 默认配置（用户可在前端修改后存 localStorage）
+        # 考试目标日期可自行改
+        set_status("gongkao", True, "公考工作台已加载")
+        return {
+            "exam_name": "公务员考试",
+            "exam_date": "2027-12-01",       # 默认目标日期，前端可改
+            "base_date": base_date.strftime("%Y-%m-%d"),
+            "habits": [
+                {"key": "count",      "title": "数量统计",     "icon": "🔢", "pct": 0, "count": 0,
+                 "sub": ["数量专项练习题", "数字推理", "数学运算"]},
+                {"key": "material",   "title": "资料通刷",     "icon": "📊", "pct": 0, "count": 0,
+                 "sub": ["资料分析练习", "图表阅读", "增速计算"]},
+                {"key": "error",      "title": "错题率",       "icon": "❌", "pct": 0, "count": 0,
+                 "sub": ["错题回顾", "易错点整理", "错题重做"]},
+                {"key": "data_long",  "title": "数据长条",     "icon": "📏", "pct": 0, "count": 0,
+                 "sub": ["长篇资料", "综合判断", "趋势分析"]},
+                {"key": "analysis",   "title": "资料分析",     "icon": "📈", "pct": 0, "count": 0,
+                 "sub": ["比重计算", "倍数问题", "平均数"]},
+                {"key": "realtime",   "title": "实时对",       "icon": "⚡", "pct": 0, "count": 0,
+                 "sub": ["限时训练", "模拟测试", "速度提升"]},
+            ],
+            "daily_tasks": [
+                {"key": "task_count",    "label": "数量专项练习题"},
+                {"key": "task_material", "label": "资料专项练习"},
+                {"key": "task_chart",    "label": "图表等题"},
+                {"key": "task_error",    "label": "错题回顾"},
+                {"key": "task_xingce",   "label": "行测小讲堂（今日篇）"},
+                {"key": "task_shenlun",  "label": "申论小讲堂（今日篇）"},
+                {"key": "task_ielts",    "label": "雅思单词（今日组）"},
+            ],
+        }
+    except Exception as e:
+        set_status("gongkao", False, str(e))
+        return None
+
+
 # ---------------- 雅思单词 (本地离线词库，按日轮换) ----------------
 def fetch_ielts(base_date):
     try:
@@ -587,17 +627,22 @@ def sync_icloud(out_path):
 
 # ---------------- HTML 生成 ----------------
 CSS = """
-:root{--bg:#fff2f8;--card:#ffffff;--ink:#3a2b33;--sub:#9a7f8c;--line:#f6e1ec;
---accent:#e85a9b;--green:#1f9d55;--red:#d8442f;--chip:#ffe9f3;--shadow:0 1px 3px rgba(214,120,170,.10);
---sidebar-active:#ec6aa6;--sidebar-active-text:#ffffff;--sidebar-hover:#fdeef5;
---page-bg:radial-gradient(120% 120% at 15% 8%, #fff7fb 0%, transparent 46%), linear-gradient(135deg,#ffe6f2 0%,#ffd3e8 45%,#f1d9ff 100%)}
-[data-theme=dark]{--bg:#16181d;--card:#1f232b;--ink:#e6e8ec;--sub:#9aa3b2;--line:#2c313a;
---accent:#5b8bff;--green:#34d27b;--red:#ff6b54;--chip:#232a36;--shadow:0 1px 3px rgba(0,0,0,.4);
---sidebar-active:#8cae62;--sidebar-active-text:#11151a;--sidebar-hover:#252b33;
---page-bg:linear-gradient(135deg,#1b1e25,#14161b)}
+:root{--bg:oklch(98% 0.012 350);--card:#ffffff;--ink:oklch(33% 0.035 350);--sub:oklch(55% 0.022 350);--line:oklch(94% 0.018 350);
+--accent:oklch(62% 0.17 350);--green:#1f9d55;--red:#d8442f;--chip:oklch(96.5% 0.024 350);
+--shadow:0 1px 2px rgba(220,90,155,.06),0 10px 30px -16px rgba(220,90,155,.22);
+--sidebar-active:oklch(64% 0.16 350);--sidebar-active-text:#ffffff;--sidebar-hover:oklch(96% 0.03 350);
+--page-bg:radial-gradient(130% 120% at 12% 6%, oklch(99.5% 0.006 350) 0%, transparent 48%), linear-gradient(135deg, oklch(96.5% 0.045 350) 0%, oklch(94% 0.065 355) 46%, oklch(95% 0.05 300) 100%);
+--r-sm:10px;--r-md:14px;--r-lg:18px;--r-pill:999px;
+--fs-xs:11px;--fs-sm:12.5px;--fs-base:14.5px;--fs-md:17px;--fs-lg:21px;--fs-xl:27px;
+--ease-out-quart:cubic-bezier(0.25,1,0.5,1);--ease-out-expo:cubic-bezier(0.16,1,0.3,1);--ease-inout:cubic-bezier(0.65,0,0.35,1)}
+[data-theme=dark]{--bg:oklch(20% 0.012 350);--card:oklch(24% 0.014 350);--ink:oklch(92% 0.012 350);--sub:oklch(68% 0.022 350);--line:oklch(32% 0.015 350);
+--accent:oklch(72% 0.15 350);--green:#34d27b;--red:#ff6b54;--chip:oklch(28% 0.015 350);
+--shadow:0 1px 2px rgba(0,0,0,.4),0 12px 30px -18px rgba(0,0,0,.5);
+--sidebar-active:oklch(70% 0.14 350);--sidebar-active-text:#16101a;--sidebar-hover:oklch(30% 0.015 350);
+--page-bg:linear-gradient(135deg,oklch(19% 0.012 350),oklch(15% 0.01 350))}
 *{box-sizing:border-box}html,body{margin:0;height:100%;overflow:hidden;background:var(--page-bg,var(--bg));background-attachment:fixed;color:var(--ink);
 font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;
-font-size:15px;line-height:1.55}
+font-size:15px;line-height:1.58;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;font-kerning:normal}
 .app{display:flex;height:100vh;width:100vw}
 /* sidebar */
 .sidebar{width:260px;flex-shrink:0;background:var(--card);border-right:1px solid var(--line);
@@ -610,9 +655,11 @@ display:flex;align-items:center;justify-content:center;font-size:22px;color:#fff
 .brand-sub{font-size:12px;color:var(--sub);margin-top:2px}
 .nav-list{flex:1;overflow:auto;padding:4px 0}
 .nav-item{display:flex;align-items:center;gap:12px;padding:12px 14px;margin:2px 6px;border-radius:12px;
-cursor:pointer;color:var(--ink);transition:background .15s, color .15s}
+cursor:pointer;color:var(--ink);transition:background .22s var(--ease-out-quart), color .22s var(--ease-out-quart)}
 .nav-item:hover{background:var(--sidebar-hover)}
-.nav-item.active{background:var(--sidebar-active);color:var(--sidebar-active-text);box-shadow:0 2px 8px rgba(107,140,66,.35)}
+.nav-item.active{background:linear-gradient(135deg,var(--sidebar-active),oklch(70% 0.15 350));color:var(--sidebar-active-text);
+box-shadow:0 8px 22px -8px rgba(220,90,155,.55);position:relative}
+.nav-item.active::before{content:'';position:absolute;left:0;top:20%;bottom:20%;width:3px;border-radius:3px;background:rgba(255,255,255,.92)}
 .nav-item.active .nav-sub{color:rgba(255,255,255,.85)}
 .nav-icon{font-size:20px;width:26px;text-align:center;flex-shrink:0}
 .nav-text{flex:1;display:flex;flex-direction:column}
@@ -631,21 +678,21 @@ padding:6px 10px;font-size:18px;cursor:pointer}
 .topbar-right{display:flex;align-items:center;gap:10px}
 .btn{display:inline-flex;align-items:center;gap:6px;background:var(--chip);color:var(--ink);
 border:1px solid var(--line);border-radius:10px;padding:7px 13px;cursor:pointer;font-size:13px;
-transform:translateY(0);transition:all .15s}
+transform:translateY(0);transition:all .22s var(--ease-out-quart)}
 .btn:hover{background:var(--sidebar-hover)}
 .btn-primary{background:var(--sidebar-active);color:var(--sidebar-active-text);border-color:var(--sidebar-active)}
 .btn-primary:hover{filter:brightness(1.08)}
 .content{flex:1;overflow:auto;padding:22px 26px 40px}
-.section{display:none;max-width:980px;margin:0 auto;animation:fadeIn .25s ease}
-.section.active{display:block}
-@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-.section-title{font-size:24px;font-weight:700;margin:0 0 4px}
+.section{display:none;max-width:960px;margin:0 auto}
+.section.active{display:block;animation:sectionIn .5s var(--ease-out-expo) both}
+@keyframes sectionIn{from{opacity:0;transform:translateY(14px) scale(.992)}to{opacity:1;transform:none}}
+.section-title{font-size:var(--fs-xl);font-weight:800;letter-spacing:-.5px;margin:0 0 4px}
 .section-sub{color:var(--sub);font-size:14px;margin-bottom:18px}
 .ielts-bar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:14px}
 .ielts-progress{font-size:14px;color:var(--sub)}
 .ielts-progress b{color:var(--accent)}
 .ielts-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
-.ielts-card{background:var(--chip);border:1px solid var(--line);border-radius:14px;padding:14px 16px;cursor:pointer;transition:all .15s}
+.ielts-card{background:var(--chip);border:1px solid var(--line);border-radius:14px;padding:14px 16px;cursor:pointer;transition:all .22s var(--ease-out-quart)}
 .ielts-card:hover{box-shadow:var(--shadow);transform:translateY(-2px)}
 .ielts-wordrow{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .ielts-word{font-size:19px;font-weight:700;color:var(--ink)}
@@ -658,7 +705,7 @@ transform:translateY(0);transition:all .15s}
 .ielts-ex{font-size:13px;color:var(--ink);line-height:1.5;margin-bottom:4px}
 .ielts-exzh{font-size:12px;color:var(--sub);line-height:1.5;margin-bottom:10px}
 .ielts-master{width:100%;border:1px solid var(--line);background:var(--card);color:var(--ink);
-border-radius:10px;padding:7px;cursor:pointer;font-size:13px;transition:all .15s}
+border-radius:10px;padding:7px;cursor:pointer;font-size:13px;transition:all .22s var(--ease-out-quart)}
 .ielts-master:hover{background:var(--sidebar-hover)}
 .ielts-master.done{background:var(--green);color:#fff;border-color:var(--green)}
 .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 20px;
@@ -672,8 +719,8 @@ li:last-child{border-bottom:none}
 a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
 .muted{color:var(--sub);font-size:13px}
 .row{display:flex;justify-content:space-between;gap:12px;align-items:baseline}
-.gain{font-weight:700}.up{color:var(--red)}.down{color:var(--green)}
-table{width:100%;border-collapse:collapse;font-size:13.5px}
+.gain{font-weight:700;font-variant-numeric:tabular-nums}.up{color:var(--red)}.down{color:var(--green)}
+table{width:100%;border-collapse:collapse;font-size:13.5px;font-variant-numeric:tabular-nums}
 th,td{text-align:left;padding:6px 7px;border-bottom:1px solid var(--line)}
 th{color:var(--sub);font-weight:600;font-size:12px}
 .tag{display:inline-block;background:var(--chip);color:var(--sub);font-size:11px;
@@ -686,10 +733,103 @@ padding:14px 16px;margin-bottom:12px}
 .note{font-size:12px;color:var(--sub);margin-top:8px}
 .scroll{max-height:520px;overflow:auto}
 footer{color:var(--sub);font-size:11.5px;text-align:center;padding:18px 0 8px}
-/* 每日计划页 */
+/* 公考工作台 */
+.gk-exam-bar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:18px}
+.gk-exam-bar .left{display:flex;align-items:center;gap:12px}
+.gk-exam-bar .mascot{font-size:42px;line-height:1}
+.gk-exam-info{display:flex;flex-direction:column}
+.gk-exam-title{font-size:18px;font-weight:700}
+.gk-exam-date{font-size:13px;color:var(--sub);margin-top:2px}
+.gk-countdown{font-size:28px;font-weight:800;color:var(--accent);letter-spacing:-0.5px}
+.gk-countdown-label{font-size:12px;color:var(--sub);text-align:center}
+.gk-progress-wrap{margin:10px 0 14px}
+.gk-progress-bar{height:10px;background:var(--line);border-radius:5px;overflow:hidden}
+.gk-progress-fill{height:100%;background:linear-gradient(90deg,var(--sidebar-active),#ff7ab8);border-radius:5px;transition:width .4s ease}
+.gk-progress-text{font-size:13px;color:var(--sub);margin-top:6px}
+.gk-habit-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}
+@media(max-width:640px){.gk-habit-grid{grid-template-columns:repeat(2,1fr)}}
+.gk-habit-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;box-shadow:var(--shadow);transition:transform .15s var(--ease-out-quart),box-shadow .22s var(--ease-out-quart)}
+.gk-habit-card:hover{transform:translateY(-1px);box-shadow:var(--shadow)}
+.gk-habit-head{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.gk-habit-icon{font-size:20px}
+.gk-habit-title{font-size:14px;font-weight:700}
+.gk-habit-pct{font-size:24px;font-weight:800;color:var(--accent);margin-bottom:2px}
+.gk-habit-pct.zero{color:var(--sub)}
+.gk-habit-count{font-size:12px;color:var(--sub);margin-bottom:10px}
+.gk-habit-sub{display:flex;flex-direction:column;gap:6px}
+.gk-habit-sub-item{font-size:12px;color:var(--sub);display:flex;align-items:center;gap:6px}
+.gk-habit-sub-check{width:14px;height:14px;border:2px solid var(--line);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;cursor:pointer;flex-shrink:0;transition:all .22s var(--ease-out-quart)}
+.gk-habit-sub-check.done{background:var(--sidebar-active);border-color:var(--sidebar-active)}
+.gk-habit-sub-check.done::after{content:'✓'}
+.gk-plan-checklist{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.gk-plan-item{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 14px;cursor:pointer;transition:transform .15s var(--ease-out-quart),box-shadow .22s var(--ease-out-quart)}
+.gk-plan-item:hover{transform:translateY(-1px);box-shadow:var(--shadow)}
+.gk-plan-check{width:20px;height:20px;border:2px solid var(--line);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff;flex-shrink:0;transition:all .22s var(--ease-out-quart)}
+.gk-plan-check.done{background:var(--sidebar-active);border-color:var(--sidebar-active)}
+.gk-plan-check.done::after{content:'✓'}
+.gk-plan-label{flex:1;font-size:14px}
+.gk-plan-label.done{text-decoration:line-through;color:var(--sub)}
+.gk-selftest{display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-top:10px}
+.gk-selftest-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;text-align:center;min-width:130px;box-shadow:var(--shadow)}
+.gk-selftest-val{font-size:28px;font-weight:800;color:var(--accent)}
+.gk-selftest-val.green{color:var(--green)}
+.gk-selftest-val.red{color:var(--red)}
+.gk-selftest-label{font-size:12px;color:var(--sub);margin-top:4px}
+.gk-selftest-btn{background:var(--sidebar-active);color:var(--sidebar-active-text);border:none;border-radius:12px;padding:12px 24px;font-size:15px;font-weight:600;cursor:pointer;transition:filter .22s var(--ease-out-quart);box-shadow:0 2px 8px rgba(232,90,155,.35)}
+.gk-selftest-btn:hover{filter:brightness(1.08)}
+.gk-config-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
+.gk-config-input{border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-size:14px;background:var(--bg);color:var(--ink);font-family:inherit;min-width:140px}
+.gk-config-input:focus{outline:none;border-color:var(--sidebar-active)}
+.gk-config-label{font-size:13px;color:var(--sub)}
+.gk-edit-btn{font-size:12px;color:var(--accent);cursor:pointer;border:none;background:transparent;padding:4px 8px;border-radius:6px}
+.gk-edit-btn:hover{background:var(--sidebar-hover)}
+.gk-history{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:10px}
+.gk-history-cell{width:100%;padding-bottom:100%;border-radius:6px;background:var(--line);position:relative;transition:background .2s}
+.gk-history-cell.ok{background:var(--green)}
+.gk-history-cell.partial{background:linear-gradient(135deg,var(--green)50%,var(--line)50%)}
+.gk-history-cell-label{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--sub)}
+/* 公考工作台：三栏布局 */
+.gk-layout{display:flex;gap:16px;align-items:flex-start}
+@media(max-width:900px){.gk-layout{flex-direction:column}}
+/* 左侧导航栏 */
+.gk-sidebar{width:160px;flex-shrink:0;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 8px;box-shadow:var(--shadow);position:sticky;top:80px}
+.gk-sidebar-header{display:flex;align-items:center;gap:8px;padding:10px 8px 12px;border-bottom:1px solid var(--line);margin-bottom:6px}
+.gk-sidebar-logo{width:32px;height:32px;background:linear-gradient(135deg,#e85a9b,#ff7ab8);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;color:#fff;font-weight:700}
+.gk-sidebar-title{font-size:15px;font-weight:700}
+.gk-nav-list{display:flex;flex-direction:column;gap:2px}
+.gk-nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;font-size:13.5px;font-weight:500;cursor:pointer;transition:background .15s var(--ease-out-quart),color .15s var(--ease-out-quart);user-select:none}
+.gk-nav-item:hover{background:var(--sidebar-hover)}
+.gk-nav-item.active{background:var(--sidebar-active);color:var(--sidebar-active-text)}
+.gk-nav-icon{font-size:16px;width:20px;text-align:center;flex-shrink:0}
+/* 右侧宠物面板 */
+.gk-right-panel{width:220px;flex-shrink:0;display:flex;flex-direction:column;gap:12px}
+.gk-pet-card{background:linear-gradient(145deg,#ff6b8a,#e85a9b);border-radius:16px;padding:18px 16px;color:#fff;box-shadow:0 4px 16px rgba(232,90,155,.35);position:relative;overflow:hidden}
+.gk-pet-card::before{content:'';position:absolute;top:-30px;right:-30px;width:100px;height:100px;background:rgba(255,255,255,.08);border-radius:50%}
+.gk-pet-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.gk-pet-avatar{font-size:48px;line-height:1;filter:drop-shadow(0 2px 4px rgba(0,0,0,.2))}
+.gk-pet-close{cursor:pointer;font-size:16px;opacity:.7;transition:opacity .22s var(--ease-out-quart)}
+.gk-pet-close:hover{opacity:1}
+.gk-pet-name{font-size:16px;font-weight:700;margin-bottom:4px}
+.gk-pet-level{font-size:12px;opacity:.85}
+.gk-pet-stats{display:flex;gap:12px;margin:12px 0 10px;font-size:12px}
+.gk-pet-stat{display:flex;align-items:center;gap:4px}
+.gk-pet-bars{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+.gk-pet-bar-row{display:flex;align-items:center;gap:8px;font-size:11px}
+.gk-pet-bar-label{width:36px;flex-shrink:0}
+.gk-pet-bar-track{flex:1;height:8px;background:rgba(255,255,255,.25);border-radius:4px;overflow:hidden}
+.gk-pet-bar-fill{height:100%;background:#fff;border-radius:4px;transition:width .5s ease}
+.gk-reward-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}
+.gk-reward-item{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 4px;background:rgba(255,255,255,.12);border-radius:10px;cursor:pointer;transition:background .22s var(--ease-out-quart)}
+.gk-reward-item:hover{background:rgba(255,255,255,.24)}
+.gk-reward-icon{font-size:22px}
+.gk-reward-text{font-size:10.5px;opacity:.9}
+.gk-signin-tip{margin-top:10px;font-size:11.5px;opacity:.85;line-height:1.5;text-align:center}
+.gk-selftest-panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:var(--shadow)}
+/* end 公考工作台 */
+
 .plan-list{display:grid;gap:10px}
 .plan-item{display:flex;align-items:center;gap:14px;background:var(--card);border:1px solid var(--line);
-border-radius:14px;padding:13px 16px;cursor:pointer;transition:transform .1s, box-shadow .15s}
+border-radius:14px;padding:13px 16px;cursor:pointer;transition:transform .15s var(--ease-out-quart), box-shadow .22s var(--ease-out-quart)}
 .plan-item:hover{transform:translateY(-1px);box-shadow:var(--shadow)}
 .plan-icon{font-size:22px;width:30px;text-align:center}
 .plan-info{flex:1}
@@ -698,7 +838,7 @@ border-radius:14px;padding:13px 16px;cursor:pointer;transition:transform .1s, bo
 .plan-status{font-size:12px;color:var(--sub);white-space:nowrap}
 .plan-check{width:22px;height:22px;border:2px solid var(--line);border-radius:50%;
 display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff;flex-shrink:0;
-transition:all .15s}
+transition:all .22s var(--ease-out-quart)}
 .plan-check.done{background:var(--sidebar-active);border-color:var(--sidebar-active)}
 .progress-bar{height:8px;background:var(--line);border-radius:4px;overflow:hidden;margin-top:14px}
 .progress-fill{height:100%;background:var(--sidebar-active);border-radius:4px;transition:width .4s ease}
@@ -714,7 +854,7 @@ background:var(--bg);color:var(--ink);font-family:inherit}
 .todo-item:last-child{border-bottom:none}
 .todo-box{width:20px;height:20px;border:2px solid var(--line);border-radius:6px;flex-shrink:0;
 display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff;cursor:pointer;
-transition:all .15s}
+transition:all .22s var(--ease-out-quart)}
 .todo-box.done{background:var(--sidebar-active);border-color:var(--sidebar-active)}
 .todo-text{flex:1;font-size:14px}
 .todo-text.done{text-decoration:line-through;color:var(--sub)}
@@ -757,7 +897,7 @@ border-radius:10px;padding:5px 9px;white-space:nowrap;flex-shrink:0}
 .aipm-task-time{font-size:12px;color:var(--sub);white-space:nowrap;flex-shrink:0}
 .aipm-task-row{display:flex;align-items:center;gap:8px}
 .aipm-task{flex:1}
-.aipm-video{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:8px;background:var(--bg);border:1px solid var(--line);font-size:15px;text-decoration:none;flex-shrink:0;transition:.15s}
+.aipm-video{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:8px;background:var(--bg);border:1px solid var(--line);font-size:15px;text-decoration:none;flex-shrink:0;transition:.22s var(--ease-out-quart)}
 .aipm-video:hover{background:var(--sidebar-active);border-color:var(--sidebar-active);transform:translateY(-1px)}
 .aipm-task-wrap{padding:4px 0;border-bottom:1px dashed var(--line)}
 .aipm-task-wrap:last-child{border-bottom:none}
@@ -771,7 +911,7 @@ border-radius:10px;padding:5px 9px;white-space:nowrap;flex-shrink:0}
 
 .aipm-res-list{display:grid;gap:8px}
 .aipm-res{display:flex;align-items:center;gap:10px;background:var(--bg);border:1px solid var(--line);border-radius:12px;
-padding:10px 12px;text-decoration:none;color:var(--ink);transition:transform .1s,box-shadow .15s}
+padding:10px 12px;text-decoration:none;color:var(--ink);transition:transform .15s var(--ease-out-quart),box-shadow .22s var(--ease-out-quart)}
 .aipm-res:hover{transform:translateY(-1px);box-shadow:var(--shadow);text-decoration:none}
 .aipm-res-type{font-size:11px;background:var(--chip);color:var(--sub);border-radius:6px;padding:2px 7px;flex-shrink:0}
 .aipm-res-body{flex:1;display:flex;flex-direction:column}
@@ -787,17 +927,23 @@ padding:10px 12px;text-decoration:none;color:var(--ink);transition:transform .1s
 .aipm-iv-row{margin-top:8px}
 .aipm-iv-row b{color:var(--ink)}
 @media (max-width:860px){.aipm-rail{grid-template-columns:repeat(2,1fr)}}
-"""
+
+/* 无障碍：尊重减弱动效偏好 */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;
+  transition-duration:.01ms!important;scroll-behavior:auto!important}
+}"""
 
 
 def esc(s):
     return (str(s).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;"))
 
 
-def build_html(date_str, aihot, fund, fundnews, financial, aipm, github, xingce, shenlun, ielts):
+def build_html(date_str, aihot, fund, fundnews, financial, aipm, github, xingce, shenlun, ielts, gongkao):
     # 模块元信息 (icon, title, subtitle, key)
     modules = [
         ("🗓️", "每日计划", "完成一项打勾，进度一目了然", "dailyplan"),
+        ("🎓", "公考工作台", "公务员考试备考追踪", "gongkao"),
         ("🤖", "AI 日报", "aihot 每日精选", "aihot"),
         ("📈", "基金涨幅榜", "Top20 日/近30天涨幅", "fund"),
         ("📰", "基金资讯", "每日基金要闻", "fundnews"),
@@ -1092,6 +1238,116 @@ def build_html(date_str, aihot, fund, fundnews, financial, aipm, github, xingce,
         </div>
       </section>
 
+      <!-- 公考工作台 -->
+      <section class="section" id="section-gongkao">
+        <div class="section-title">🎓 公考工作台</div>
+        <div class="section-sub">公务员考试备考追踪 · 倒计时 · 习惯数据 · 每日计划 · 自测</div>
+        <div class="gk-layout" id="gk-layout">
+
+          <!-- 左侧导航栏 -->
+          <nav class="gk-sidebar" id="gk-sidebar">
+            <div class="gk-sidebar-header">
+              <div class="gk-sidebar-logo">公</div>
+              <span class="gk-sidebar-title">公考工作台</span>
+            </div>
+            <div class="gk-nav-list" id="gk-nav-list"></div>
+          </nav>
+
+          <!-- 中间主内容区 -->
+          <div class="gk-main" id="gk-main">
+            <div class="card" id="gk-card-exam">
+              <h2>📋 首页总览</h2>
+              <p style="font-size:13px;color:var(--sub);margin:4px 0 12px" id="gk-overview-text">今天 {esc(date_str)}，当前备考进度为 0%，距离考试还有 — 天，继续加油！</p>
+              <div class="gk-exam-bar">
+                <div class="left">
+                  <div class="mascot">😼</div>
+                  <div class="gk-exam-info">
+                    <div class="gk-exam-title" id="gk-exam-name">公务员考试</div>
+                    <div class="gk-exam-date" id="gk-exam-date">目标日期：2027-12-01</div>
+                  </div>
+                </div>
+                <div style="text-align:center">
+                  <div class="gk-countdown" id="gk-countdown">—</div>
+                  <div class="gk-countdown-label">天后考试</div>
+                </div>
+              </div>
+              <div class="gk-progress-wrap">
+                <div class="gk-progress-bar"><div class="gk-progress-fill" id="gk-progress-fill" style="width:0%"></div></div>
+                <div class="gk-progress-text" id="gk-progress-text">学习进度 0%</div>
+              </div>
+              <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px">
+                <button class="btn" id="gk-btn-edit" onclick="gkToggleEdit()">✏️ 修改目标</button>
+                <button class="btn btn-primary" onclick="gkResetToday()">🔄 重置今日打卡</button>
+              </div>
+              <div id="gk-edit-panel" style="display:none;margin-top:12px;padding-top:12px;border-top:1px dashed var(--line)">
+                <div class="gk-config-row"><span class="gk-config-label">考试名称：</span><input class="gk-config-input" id="gk-in-name" value="公务员考试"></div>
+                <div class="gk-config-row"><span class="gk-config-label">目标日期：</span><input class="gk-config-input" id="gk-in-date" type="date" value="2027-12-01"></div>
+                <button class="btn btn-primary" onclick="gkSaveConfig()">💾 保存设置</button>
+              </div>
+            </div>
+
+            <div class="card" id="gk-card-habits">
+              <h2>📊 习惯数据概览</h2>
+              <div class="gk-habit-grid" id="gk-habit-grid"></div>
+            </div>
+
+            <div class="card" id="gk-card-plan">
+              <h2>📝 每日计划完成情况</h2>
+              <div class="gk-progress-bar" style="margin-bottom:10px"><div class="gk-progress-fill" id="gk-plan-fill" style="width:0%"></div></div>
+              <div class="gk-progress-text" id="gk-plan-text">今日完成 0/7</div>
+              <div class="gk-plan-checklist" id="gk-plan-checklist"></div>
+            </div>
+          </div>
+
+          <!-- 右侧面板：宠物 + 自测 -->
+          <aside class="gk-right-panel" id="gk-right-panel">
+            <!-- 宠物卡片 -->
+            <div class="gk-pet-card" id="gk-pet-card">
+              <div class="gk-pet-header">
+                <div class="gk-pet-avatar" id="gk-pet-avatar">😼</div>
+                <span class="gk-pet-close" onclick="gkTogglePet()" title="收起">✕</span>
+              </div>
+              <div class="gk-pet-name" id="gk-pet-name">小橘猫</div>
+              <div class="gk-pet-level" id="gk-pet-level">Lv.1 新手备考</div>
+              <div class="gk-pet-stats" id="gk-pet-stats">
+                <span class="gk-pet-stat">🐱 小猫</span>
+                <span class="gk-pet-stat">❤️❤️</span>
+                <span class="gk-pet-stat">💰💰</span>
+              </div>
+              <div class="gk-pet-bars">
+                <div class="gk-pet-bar-row"><span class="gk-pet-bar-label">经验</span><div class="gk-pet-bar-track"><div class="gk-pet-bar-fill" id="gk-exp-fill" style="width:0%"></div></div></div>
+                <div class="gk-pet-bar-row"><span class="gk-pet-bar-label">亲密度</span><div class="gk-pet-bar-track"><div class="gk-pet-bar-fill" id="gk-love-fill" style="width:0%"></div></div></div>
+              </div>
+              <div class="gk-reward-grid" id="gk-reward-grid"></div>
+              <div class="gk-signin-tip" id="gk-signin-tip" onclick="gkSignin()" style="cursor:pointer">每天签到，还能免费领取奖励哦~</div>
+            </div>
+
+            <!-- 每日自测题 -->
+            <div class="gk-selftest-panel" id="gk-selftest-panel">
+              <h2>🎯 每日自测题</h2>
+              <div style="display:flex;gap:10px;margin-bottom:14px">
+                <div class="gk-selftest-card" style="flex:1;padding:12px">
+                  <div class="gk-selftest-val" id="gk-score">0%</div>
+                  <div class="gk-selftest-label">当前正确率</div>
+                </div>
+                <div class="gk-selftest-card" style="flex:1;padding:12px">
+                  <div class="gk-selftest-val" id="gk-time">0.0s</div>
+                  <div class="gk-selftest-label">平均用时</div>
+                </div>
+              </div>
+              <button class="gk-selftest-btn" style="width:100%" onclick="gkStartTest()">开始自测</button>
+              <div id="gk-test-panel" style="display:none;margin-top:14px;padding-top:14px;border-top:1px dashed var(--line)">
+                <div style="font-size:13px;color:var(--sub);margin-bottom:8px">模拟自测（输入你的答题结果）</div>
+                <div class="gk-config-row"><span class="gk-config-label">答对：</span><input class="gk-config-input" id="gk-in-correct" type="number" min="0" value="0" style="width:70px"></div>
+                <div class="gk-config-row"><span class="gk-config-label">总题：</span><input class="gk-config-input" id="gk-in-total" type="number" min="1" value="10" style="width:70px"></div>
+                <div class="gk-config-row"><span class="gk-config-label">用时(秒)：</span><input class="gk-config-input" id="gk-in-seconds" type="number" min="0" value="0" style="width:90px"></div>
+                <button class="btn btn-primary" style="width:100%;margin-top:6px" onclick="gkSubmitTest()">📊 提交记录</button>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </section>
+
       <!-- AI 日报 -->
       <section class="section" id="section-aihot">
         <div class="section-title">🤖 AI 日报</div>
@@ -1174,7 +1430,8 @@ const modules = {{
   github: "GitHub AI 热点",
   xingce: "行测每日练",
   shenlun: "申论每日读",
-  ielts: "雅思单词"
+  ielts: "雅思单词",
+  gongkao: "公考工作台"
 }};
 function switchTab(el, key){{
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
@@ -1340,11 +1597,273 @@ function saveMemo(){{
   const ta = document.getElementById('memo-input');
   if(ta) localStorage.setItem(memoKey, ta.value);
 }}
+/* 公考工作台 JS */
+const gkCfgKey = "wb_gk_cfg";
+const gkHabitKey = "wb_gk_habit_{esc(date_str)}_";
+const gkPlanKey = "wb_gk_plan_{esc(date_str)}_";
+const gkTestKey = "wb_gk_test";
+function gkLoadConfig(){{
+  let cfg={{exam_name:"公务员考试",exam_date:"2027-12-01"}};
+  try{{const s=localStorage.getItem(gkCfgKey);if(s)cfg=JSON.parse(s);}}catch(e){{}}
+  return cfg;
+}}
+function gkSaveConfig(){{
+  const name=document.getElementById('gk-in-name').value.trim()||"公务员考试";
+  const date=document.getElementById('gk-in-date').value||"2027-12-01";
+  localStorage.setItem(gkCfgKey,JSON.stringify({{exam_name:name,exam_date:date}}));
+  gkRender();
+  gkToggleEdit();
+}}
+function gkToggleEdit(){{
+  const p=document.getElementById('gk-edit-panel');
+  const btn=document.getElementById('gk-btn-edit');
+  if(p.style.display==='none'){{p.style.display='block';btn.textContent='❌ 取消';}}
+  else{{p.style.display='none';btn.textContent='✏️ 修改目标';}}
+}}
+function gkResetToday(){{
+  Object.keys(localStorage).forEach(k=>{{if(k.startsWith(gkHabitKey)||k.startsWith(gkPlanKey))localStorage.removeItem(k);}});
+  gkRender();
+}}
+function gkDaysUntil(target){{
+  const t=new Date(target+'T00:00:00');const n=new Date();n.setHours(0,0,0,0);
+  const d=Math.ceil((t-n)/(86400000));return d;
+}}
+function gkRenderHabit(name,icon,subList,key){{
+  let done=0;subList.forEach((_,i)=>{{if(localStorage.getItem(gkHabitKey+key+'_'+i)==='1')done++;}});
+  const pct=subList.length?Math.round(done/subList.length*100):0;
+  const zeroClass=pct===0?' zero':'';
+  let subs='';subList.forEach((s,i)=>{{
+    const d=localStorage.getItem(gkHabitKey+key+'_'+i)==='1';
+    subs+='<div class="gk-habit-sub-item"><div class="gk-habit-sub-check'+(d?' done':'')+'" onclick="gkToggleHabit(\\''+key+'\\',\\''+i+'\\',this)"></div>'+esc(s)+'</div>';
+  }});
+  return '<div class="gk-habit-card"><div class="gk-habit-head"><span class="gk-habit-icon">'+icon+'</span><span class="gk-habit-title">'+esc(name)+'</span></div><div class="gk-habit-pct'+zeroClass+'">'+pct+'%</div><div class="gk-habit-count">'+done+'/'+subList.length+' 项</div><div class="gk-habit-sub">'+subs+'</div></div>';
+}}
+function gkToggleHabit(key,idx,el){{
+  const k=gkHabitKey+key+'_'+idx;const done=localStorage.getItem(k)==='1';
+  localStorage.setItem(k,done?'':'1');el.classList.toggle('done',!done);
+  gkRender();
+}}
+function gkRenderPlan(label,key){{
+  const done=localStorage.getItem(gkPlanKey+key)==='1';
+  return '<div class="gk-plan-item" onclick="gkTogglePlan(\\''+key+'\\')">'+
+    '<div class="gk-plan-check'+(done?' done':'')+'" id="gk-plan-c-'+key+'"></div>'+
+    '<div class="gk-plan-label'+(done?' done':'')+'" id="gk-plan-l-'+key+'">'+esc(label)+'</div>'+
+    '</div>';
+}}
+function gkTogglePlan(key){{
+  const k=gkPlanKey+key;const done=localStorage.getItem(k)==='1';
+  localStorage.setItem(k,done?'':'1');
+  document.getElementById('gk-plan-c-'+key).classList.toggle('done',!done);
+  document.getElementById('gk-plan-l-'+key).classList.toggle('done',!done);
+  gkUpdatePlanProgress();
+}}
+function gkUpdatePlanProgress(){{
+  const items=[{esc(','.join([f'"{t["key"]}"' for t in gongkao.get("daily_tasks", [])]))}];
+  let done=0;items.forEach(k=>{{if(localStorage.getItem(gkPlanKey+k)==='1')done++;}});
+  const pct=items.length?Math.round(done/items.length*100):0;
+  document.getElementById('gk-plan-fill').style.width=pct+'%';
+  document.getElementById('gk-plan-text').textContent='今日完成 '+done+'/'+items.length+' ('+pct+'%)';
+}}
+function gkUpdateStudyProgress(){{
+  let total=0,done=0;
+  const habits=[{esc(','.join([f'"{h["key"]}"' for h in gongkao.get("habits", [])]))}];
+  habits.forEach(hk=>{{
+    const subCount=localStorage.getItem('gk_subcount_'+hk);
+    if(!subCount)return;const n=parseInt(subCount,10)||0;
+    for(let i=0;i<n;i++){{total++;if(localStorage.getItem(gkHabitKey+hk+'_'+i)==='1')done++;}}
+  }});
+  const pct=total?Math.round(done/total*100):0;
+  document.getElementById('gk-progress-fill').style.width=pct+'%';
+  document.getElementById('gk-progress-text').textContent='学习进度 '+pct+'%';
+}}
+function gkStartTest(){{
+  const p=document.getElementById('gk-test-panel');
+  p.style.display=p.style.display==='none'?'block':'none';
+}}
+function gkSubmitTest(){{
+  const c=parseInt(document.getElementById('gk-in-correct').value,10)||0;
+  const t=parseInt(document.getElementById('gk-in-total').value,10)||1;
+  const s=parseInt(document.getElementById('gk-in-seconds').value,10)||0;
+  const pct=Math.round(c/t*100);
+  const m=Math.floor(s/60);const sec=s%60;
+  const rec={{date:'{esc(date_str)}',correct:c,total:t,pct:pct,seconds:s}};
+  let hist=[];try{{hist=JSON.parse(localStorage.getItem(gkTestKey)||'[]');}}catch(e){{}}
+  hist.push(rec);if(hist.length>30)hist=hist.slice(-30);
+  localStorage.setItem(gkTestKey,JSON.stringify(hist));
+  document.getElementById('gk-score').textContent=pct+'%';document.getElementById('gk-score').className='gk-selftest-val '+(pct>=60?'green':'red');
+  document.getElementById('gk-time').textContent=(s/10).toFixed(1)+'s';
+  document.getElementById('gk-test-panel').style.display='none';
+  gkRenderHistory();
+}}
+function gkRenderHistory(){{
+  let hist=[];try{{hist=JSON.parse(localStorage.getItem(gkTestKey)||'[]');}}catch(e){{}}
+  const days=7;const arr=hist.slice(-days);const grid=document.getElementById('gk-history');
+  if(!grid)return;grid.innerHTML='';
+  for(let i=0;i<days;i++){{
+    const d=arr[i];const cell=document.createElement('div');cell.className='gk-history-cell';
+    if(d){{const ok=d.pct>=60;cell.classList.add(ok?'ok':'partial');}}
+    const label=document.createElement('div');label.className='gk-history-cell-label';label.textContent=d?d.pct+'%':'—';
+    cell.appendChild(label);grid.appendChild(cell);
+  }}
+}}
+/* 导航栏 */
+function gkRenderNav(){{
+  const navList=document.getElementById('gk-nav-list');
+  if(!navList)return;
+  const navItems=[
+    {{icon:'🏠',label:'首页总览',key:'home'}},
+    {{icon:'📝',label:'模拟考试',key:'mock'}},
+    {{icon:'🎯',label:'专项练习',key:'practice'}},
+    {{icon:'❌',label:'错题管理',key:'errors'}},
+    {{icon:'📈',label:'学习进度',key:'progress'}},
+    {{icon:'📚',label:'题库练习',key:'bank'}},
+    {{icon:'💡',label:'知识点大全',key:'knowledge'}},
+    {{icon:'📅',label:'考试日历',key:'calendar'}},
+    {{icon:'📊',label:'统计分析',key:'stats'}},
+    {{icon:'💬',label:'社区讨论',key:'community'}},
+    {{icon:'⭐',label:'我的收藏',key:'favorites'}}
+  ];
+  let activeKey=localStorage.getItem('wb_gk_nav_active')||'home';
+  let html='';
+  navItems.forEach(n=>{{
+    const cls=n.key===activeKey?' active':'';
+    html+='<div class="gk-nav-item'+cls+'" onclick="gkNavClick(\\''+n.key+'\\')"><span class="gk-nav-icon">'+n.icon+'</span><span>'+esc(n.label)+'</span></div>';
+  }});
+  navList.innerHTML=html;
+}}
+function gkNavClick(key){{
+  localStorage.setItem('wb_gk_nav_active',key);
+  gkRenderNav();
+  // Show toast
+  gkToast('已切换到：'+document.querySelector('.gk-nav-item.active .gk-nav-icon').textContent+' '+document.querySelector('.gk-nav-item.active').lastChild.textContent.trim());
+}}
+/* 宠物面板 */
+const gkPetKey = "wb_gk_pet";
+function gkLoadPet(){{
+  let pet={{name:'小橘猫',level:1,exp:0,love:0,avatar:'😼',signins:0,lastSignin:''}};
+  try{{const s=localStorage.getItem(gkPetKey);if(s)pet=JSON.parse(s);}}catch(e){{}}
+  return pet;
+}}
+function gkSavePet(pet){{ localStorage.setItem(gkPetKey,JSON.stringify(pet)); }}
+function gkTogglePet(){{
+  const panel=document.getElementById('gk-right-panel');
+  if(panel.style.display==='none'){{panel.style.display='flex';}}
+  else{{panel.style.display='none';}}
+}}
+function gkRenderPet(){{
+  const pet=gkLoadPet();
+  document.getElementById('gk-pet-avatar').textContent=pet.avatar||'😼';
+  document.getElementById('gk-pet-name').textContent=pet.name||'小橘猫';
+  // Level from exp
+  const level=Math.floor((pet.exp||0)/100)+1;
+  const levelNames=['新手备考','入门学员','勤奋考生','进阶高手','资深学霸','备考大神','上岸王者'];
+  document.getElementById('gk-pet-level').textContent='Lv.'+level+' '+(levelNames[Math.min(level-1,levelNames.length-1)]||'大神');
+  // Exp bar
+  const expPct=((pet.exp||0)%100);
+  document.getElementById('gk-exp-fill').style.width=expPct+'%';
+  // Love bar
+  const lovePct=Math.min((pet.love||0)*10,100);
+  document.getElementById('gk-love-fill').style.width=lovePct+'%';
+  // Signin tip
+  const today='{esc(date_str)}';
+  if(pet.lastSignin===today){{ document.getElementById('gk-signin-tip').textContent='✅ 今日已签到，明天再来吧！'; }}
+  else{{ document.getElementById('gk-signin-tip').textContent='每天签到，还能免费领取奖励哦~'; }}
+}}
+function gkRenderRewards(){{
+  const grid=document.getElementById('gk-reward-grid');
+  if(!grid)return;
+  const rewards=[
+    {{icon:'🃏',text:'小卡子',action:'card'}},
+    {{icon:'🤖',text:'题量AI',action:'ai'}},
+    {{icon:'📒',text:'整理本',action:'notebook'}},
+    {{icon:'⭐',text:'收藏夹',action:'fav'}},
+    {{icon:'🏆',text:'成就榜',action:'rank'}},
+    {{icon:'🎁',text:'每日奖励',action:'daily'}}
+  ];
+  let html='';
+  rewards.forEach(r=>{{
+    html+='<div class="gk-reward-item" onclick="gkRewardClick(\\''+r.action+'\\')"><span class="gk-reward-icon">'+r.icon+'</span><span class="gk-reward-text">'+esc(r.text)+'</span></div>';
+  }});
+  grid.innerHTML=html;
+}}
+function gkRewardClick(action){{
+  const msgs={{card:'小卡子：记录你的学习卡片',ai:'题量AI：智能推荐今日题量',notebook:'整理本：错题与笔记汇总',fav:'收藏夹：收藏的题目和资料',rank:'成就榜：查看你的学习成就',daily:'每日奖励：坚持打卡解锁！'}};
+  gkToast(msgs[action]||'功能开发中...');
+}}
+function gkSignin(){{
+  const pet=gkLoadPet();
+  const today='{esc(date_str)}';
+  if(pet.lastSignin===today){{ gkToast('今天已经签过到啦！'); return; }}
+  pet.lastSignin=today;
+  pet.signins=(pet.signins||0)+1;
+  pet.exp=(pet.exp||0)+10;
+  pet.love=(pet.love||0)+5;
+  gkSavePet(pet);
+  gkRenderPet();
+  gkToast('🎉 签到成功！经验+10 亲密度+5');
+}}
+function gkToast(msg){{
+  let t=document.getElementById('gk-toast');
+  if(!t){{ t=document.createElement('div'); t.id='gk-toast'; t.style.cssText='position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:10px 20px;border-radius:10px;font-size:14px;z-index:9999;opacity:0;transition:opacity .3s;pointer-events:none'; document.body.appendChild(t); }}
+  t.textContent=msg;t.style.opacity='1';
+  clearTimeout(t._timer);t._timer=setTimeout(()=>{{t.style.opacity='0';}},2000);
+}}
+function gkRender(){{
+  const cfg=gkLoadConfig();
+  document.getElementById('gk-exam-name').textContent=cfg.exam_name;
+  document.getElementById('gk-exam-date').textContent='目标日期：'+cfg.exam_date;
+  document.getElementById('gk-in-name').value=cfg.exam_name;
+  document.getElementById('gk-in-date').value=cfg.exam_date;
+  const days=gkDaysUntil(cfg.exam_date);
+  document.getElementById('gk-countdown').textContent=days>0?days:0;
+  // 首页总览副标题
+  const pctEl=document.getElementById('gk-progress-fill');
+  const curPct=pctEl?parseInt(pctEl.style.width,10)||0:0;
+  document.getElementById('gk-overview-text').textContent='今天 {esc(date_str)}，当前备考进度为 '+curPct+'%，距离考试还有 '+(days>0?days:0)+' 天，继续加油！';
+  // 导航栏
+  gkRenderNav();
+  // 习惯卡片
+  const habitGrid=document.getElementById('gk-habit-grid');
+  if(habitGrid){{
+    let hhtml='';
+    const habits=[
+      {{name:'数量统计',icon:'🔢',key:'count',subs:['数量专项练习题','数字推理','数学运算']}},
+      {{name:'资料通刷',icon:'📊',key:'material',subs:['资料分析练习','图表阅读','增速计算']}},
+      {{name:'错题率',icon:'❌',key:'error',subs:['错题回顾','易错点整理','错题重做']}},
+      {{name:'数据长条',icon:'📏',key:'data_long',subs:['长篇资料','综合判断','趋势分析']}},
+      {{name:'资料分析',icon:'📈',key:'analysis',subs:['比重计算','倍数问题','平均数']}},
+      {{name:'实时对',icon:'⚡',key:'realtime',subs:['限时训练','模拟测试','速度提升']}}
+    ];
+    habits.forEach(h=>{{
+      localStorage.setItem('gk_subcount_'+h.key,h.subs.length);
+      hhtml+=gkRenderHabit(h.name,h.icon,h.subs,h.key);
+    }});
+    habitGrid.innerHTML=hhtml;
+  }}
+  // 每日计划
+  const planList=document.getElementById('gk-plan-checklist');
+  if(planList){{
+    planList.innerHTML=gkRenderPlan('数量专项练习题','task_count')
+      +gkRenderPlan('资料专项练习','task_material')
+      +gkRenderPlan('图表等题','task_chart')
+      +gkRenderPlan('错题回顾','task_error')
+      +gkRenderPlan('行测小讲堂（今日篇）','task_xingce')
+      +gkRenderPlan('申论小讲堂（今日篇）','task_shenlun')
+      +gkRenderPlan('雅思单词（今日组）','task_ielts');
+  }}
+  gkUpdatePlanProgress();
+  gkUpdateStudyProgress();
+  // 宠物面板
+  gkRenderPet();
+  gkRenderRewards();
+}}
+/* 初始化 */
 renderChecks();
 initAipmChecks();
 initIelts();
 renderTodos();
 loadMemo();
+gkRender();
 </script>
 </body>
 </html>"""
@@ -1370,6 +1889,7 @@ def main():
     os.makedirs(ARCHIVE_DIR, exist_ok=True)
 
     print(f"▶ 生成 {date_str} 每日工作台 ...") if not DEBUG else None
+    gongkao = fetch_gongkao(base_date)
     aihot = fetch_aihot()
     fund = fetch_fund_ranking(base_date)
     fundnews = fetch_fund_news()
@@ -1380,7 +1900,7 @@ def main():
     shenlun = fetch_shenlun(base_date)
     ielts = fetch_ielts(base_date)
 
-    html = build_html(date_str, aihot, fund, fundnews, financial, aipm, github, xingce, shenlun, ielts)
+    html = build_html(date_str, aihot, fund, fundnews, financial, aipm, github, xingce, shenlun, ielts, gongkao)
 
     out_path = os.path.join(OUT_DIR, "dashboard.html")
     with open(out_path, "w", encoding="utf-8") as f:
