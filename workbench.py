@@ -627,21 +627,21 @@ def sync_icloud(out_path):
 
 # ---------------- HTML 生成 ----------------
 CSS = """
-:root{--daer-img:url(__DAER_DATA__);--bg:oklch(98% 0.012 350);--card:#ffffff;--ink:oklch(33% 0.035 350);--sub:oklch(55% 0.022 350);--line:oklch(94% 0.018 350);
---accent:oklch(62% 0.17 350);--green:#1f9d55;--red:#d8442f;--chip:oklch(96.5% 0.024 350);
---shadow:0 1px 2px rgba(220,90,155,.06),0 10px 30px -16px rgba(220,90,155,.22);
---sidebar-active:oklch(64% 0.16 350);--sidebar-active-text:#ffffff;--sidebar-hover:oklch(96% 0.03 350);
---page-bg:radial-gradient(130% 120% at 12% 6%, oklch(99.5% 0.006 350) 0%, transparent 48%), linear-gradient(135deg, oklch(96.5% 0.045 350) 0%, oklch(94% 0.065 355) 46%, oklch(95% 0.05 300) 100%);
+:root{--daer-img:url(__DAER_DATA__);--bg:oklch(97% 0.014 85);--card:oklch(99% 0.008 88);--ink:oklch(34% 0.022 68);--sub:oklch(54% 0.02 72);--line:oklch(91% 0.016 82);
+--accent:oklch(56% 0.055 72);--green:#5f8a5a;--red:#b85b41;--chip:oklch(95% 0.02 85);
+--shadow:0 1px 2px rgba(120,95,70,.06),0 10px 30px -16px rgba(120,95,70,.20);
+--sidebar-active:oklch(58% 0.05 78);--sidebar-active-text:#fffdf8;--sidebar-hover:oklch(95% 0.025 85);
+--page-bg:radial-gradient(130% 120% at 12% 6%, oklch(99.5% 0.006 92) 0%, transparent 48%), linear-gradient(135deg, oklch(97% 0.022 85) 0%, oklch(95.5% 0.028 80) 46%, oklch(96% 0.022 100) 100%);
 --r-sm:10px;--r-md:14px;--r-lg:18px;--r-pill:999px;
 --fs-xs:11px;--fs-sm:12.5px;--fs-base:14.5px;--fs-md:17px;--fs-lg:21px;--fs-xl:27px;
 --ease-out-quart:cubic-bezier(0.25,1,0.5,1);--ease-out-expo:cubic-bezier(0.16,1,0.3,1);--ease-inout:cubic-bezier(0.65,0,0.35,1)}
-[data-theme=dark]{--bg:oklch(20% 0.012 350);--card:oklch(24% 0.014 350);--ink:oklch(92% 0.012 350);--sub:oklch(68% 0.022 350);--line:oklch(32% 0.015 350);
---accent:oklch(72% 0.15 350);--green:#34d27b;--red:#ff6b54;--chip:oklch(28% 0.015 350);
+[data-theme=dark]{--bg:oklch(22% 0.012 72);--card:oklch(26% 0.014 72);--ink:oklch(92% 0.01 82);--sub:oklch(68% 0.02 75);--line:oklch(34% 0.015 70);
+--accent:oklch(70% 0.05 80);--green:#7fae7f;--red:#d9795f;--chip:oklch(30% 0.015 70);
 --shadow:0 1px 2px rgba(0,0,0,.4),0 12px 30px -18px rgba(0,0,0,.5);
---sidebar-active:oklch(70% 0.14 350);--sidebar-active-text:#16101a;--sidebar-hover:oklch(30% 0.015 350);
---page-bg:linear-gradient(135deg,oklch(19% 0.012 350),oklch(15% 0.01 350))}
+--sidebar-active:oklch(66% 0.05 80);--sidebar-active-text:#fff8ef;--sidebar-hover:oklch(30% 0.015 70);
+--page-bg:linear-gradient(135deg,oklch(20% 0.01 72),oklch(16% 0.01 66))}
 *{box-sizing:border-box}html,body{margin:0;height:100%;overflow:hidden;background:var(--page-bg,var(--bg));background-attachment:fixed;color:var(--ink);
-body::before{content:"";position:fixed;right:-24px;bottom:-36px;width:560px;height:560px;background:url(__DAER_DATA__) center/contain no-repeat;opacity:.5;pointer-events:none;z-index:0;filter:drop-shadow(0 8px 22px rgba(150,90,140,.18));transition:opacity .3s var(--ease-out-quart)}
+body::before{content:"";position:fixed;right:-24px;bottom:-36px;width:560px;height:560px;background:url(__DAER_DATA__) center/contain no-repeat;opacity:.32;pointer-events:none;z-index:0;filter:drop-shadow(0 8px 22px rgba(120,95,70,.15));transition:opacity .3s var(--ease-out-quart)}
 font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;
 font-size:15px;line-height:1.58;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;font-kerning:normal}
 .app{display:flex;height:100vh;width:100vw;position:relative;z-index:1}
@@ -658,8 +658,8 @@ display:flex;align-items:center;justify-content:center;font-size:22px;color:#fff
 .nav-item{display:flex;align-items:center;gap:12px;padding:12px 14px;margin:2px 6px;border-radius:12px;
 cursor:pointer;color:var(--ink);transition:background .22s var(--ease-out-quart), color .22s var(--ease-out-quart)}
 .nav-item:hover{background:var(--sidebar-hover)}
-.nav-item.active{background:linear-gradient(135deg,var(--sidebar-active),oklch(70% 0.15 350));color:var(--sidebar-active-text);
-box-shadow:0 8px 22px -8px rgba(220,90,155,.55);position:relative}
+.nav-item.active{background:linear-gradient(135deg,var(--sidebar-active),oklch(68% 0.06 75));color:var(--sidebar-active-text);
+box-shadow:0 8px 22px -8px rgba(120,95,70,.45);position:relative}
 .nav-item.active::before{content:'';position:absolute;left:0;top:20%;bottom:20%;width:3px;border-radius:3px;background:rgba(255,255,255,.92)}
 .nav-item.active .nav-sub{color:rgba(255,255,255,.85)}
 .nav-icon{font-size:20px;width:26px;text-align:center;flex-shrink:0}
